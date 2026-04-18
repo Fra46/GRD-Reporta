@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "823723532114",
+    "project_id": "gdr-reporta-app",
+    "storage_bucket": "gdr-reporta-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823723532114:android:c68b9847f2b07f91bfa48b",
+        "android_client_info": {
+          "package_name": "com.example.grd_reporta_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9dkLXQRgcoEyjsgl-YoLSqPChmsCquAc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

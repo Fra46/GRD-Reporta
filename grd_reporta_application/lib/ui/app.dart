@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 
 import './pages/login_page.dart';
 import './pages/dashboard_page.dart';
+import './pages/splash_page.dart';
+
 import '../../controllers/auth_controller.dart';
 
 class GrdReportaApp extends StatelessWidget {
@@ -19,10 +21,18 @@ class GrdReportaApp extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.grey.shade100,
-        appBarTheme: const AppBarTheme(centerTitle: true),
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+        ),
       ),
-      initialRoute: '/login',
+
+      initialRoute: '/splash',
+
       getPages: [
+        GetPage(
+          name: '/splash',
+          page: () => const SplashPage(),
+        ),
         GetPage(
           name: '/login',
           page: () => const LoginPage(),
