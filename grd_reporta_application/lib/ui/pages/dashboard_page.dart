@@ -8,393 +8,354 @@ import '../widgets/dashboard/dashboard_header_widget.dart';
 import '../widgets/dashboard/dashboard_kpi_card.dart';
 import '../widgets/dashboard/recent_event_item.dart';
 import '../widgets/dashboard/dashboard_bottom_nav.dart';
-import '../widgets/dashboard/role_button_widget.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final DashboardController controller =
-        Get.put(DashboardController());
-
-    final AuthController auth =
-        Get.find<AuthController>();
+    final DashboardController controller = Get.put(DashboardController());
+    final AuthController auth = Get.find<AuthController>();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
-
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
-        onPressed: () {
-          Get.snackbar(
-            'Nuevo Reporte',
-            'Próximamente módulo de eventos',
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-
-      bottomNavigationBar: const DashboardBottomNav(),
-
-      body: SafeArea(
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: controller.loadDashboard,
-            child: ListView(
-              padding: const EdgeInsets.all(18),
+      body: Column(
+        children: [
+          const DashboardHeaderWidget(),
+          Expanded(
+            child: Stack(
               children: [
-                const DashboardHeaderWidget(),
-
-                const SizedBox(height: 22),
-
-                _buildKpiSection(
-                  auth.role,
-                  controller,
-                ),
-
-                const SizedBox(height: 28),
-
-                const Text(
-                  'Módulos disponibles',
-                  style: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
+                Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return RefreshIndicator(
+                    onRefresh: controller.loadDashboard,
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
+                      children: [
+                        _buildKpiSection(auth.role, controller),
+                        const SizedBox(height: 28),
+                        const Text(
+                          'Mapa de Eventos',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A1A2E),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        _buildMapPlaceholder(),
+                        const SizedBox(height: 28),
+                        const Text(
+                          'Eventos Recientes',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A1A2E),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        _buildRecentEvents(auth.role),
+                        const SizedBox(height: 140),
+                      ],
+                    ),
+                  );
+                }),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 0,
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: const DashboardBottomNav(),
+                    ),
                   ),
                 ),
-
-                const SizedBox(height: 14),
-
-                _buildRoleModules(auth.role),
-
-                const SizedBox(height: 28),
-
-                const Text(
-                  'Eventos recientes',
-                  style: TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
+                Positioned(
+                  right: 20,
+                  bottom: 90,
+                  child: SafeArea(
+                    top: false,
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.red,
+                      onPressed: () {
+                        Get.snackbar(
+                          'Nuevo Reporte',
+                          'Próximamente módulo de eventos',
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      },
+                      child: const Icon(Icons.add, color: Colors.white),
+                    ),
                   ),
                 ),
-
-                const SizedBox(height: 14),
-
-                _buildRecentEvents(auth.role),
-
-                const SizedBox(height: 100),
               ],
             ),
-          );
-        }),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildKpiSection(
-    String role,
-    DashboardController controller,
-  ) {
-    // ADMIN
-    if (role == 'admin') {
-      return Column(
+  Widget _buildMapPlaceholder() {
+    return Container(
+      height: 180,
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8EEF7),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: Stack(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: DashboardKpiCard(
-                  title: 'Abiertos',
-                  value:
-                      controller.openEvents.value.toString(),
-                  icon: Icons.warning_amber_rounded,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: DashboardKpiCard(
-                  title: 'Críticos',
-                  value: controller
-                      .criticalEvents.value
-                      .toString(),
-                  icon: Icons.priority_high,
-                ),
-              ),
-            ],
+          CustomPaint(
+            size: const Size(double.infinity, 180),
+            painter: _MapGridPainter(),
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: DashboardKpiCard(
-                  title: 'Pendientes',
-                  value: controller
-                      .pendingEvents.value
-                      .toString(),
-                  icon: Icons.fact_check_outlined,
-                ),
+          Positioned(left: 90, top: 60, child: _mapPin(Colors.red)),
+          Positioned(left: 180, top: 95, child: _mapPin(Colors.orange)),
+          Positioned(left: 130, top: 110, child: _mapPin(Colors.blue)),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              color: Colors.white.withOpacity(0.85),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.location_on, size: 14, color: Color(0xFF1B2E6B)),
+                  SizedBox(width: 4),
+                  Text(
+                    'Cesar, Colombia — Geolocalización próximamente',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF1B2E6B),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 14),
-              const Expanded(
-                child: DashboardKpiCard(
-                  title: 'Usuarios',
-                  value: '14',
-                  icon: Icons.people,
-                ),
-              ),
-            ],
+            ),
           ),
         ],
-      );
-    }
+      ),
+    );
+  }
 
-    // COORDINADOR
-    if (role == 'coordinador') {
-      return Row(
-        children: [
+  Widget _mapPin(Color color) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 18,
+          height: 18,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.4),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+        ),
+        Container(width: 2, height: 8, color: color),
+      ],
+    );
+  }
+
+  Widget _buildKpiSection(String role, DashboardController controller) {
+    if (role == 'admin') {
+      return Column(children: [
+        Row(children: [
+          Expanded(
+            child: DashboardKpiCard(
+              title: 'Eventos Hoy',
+              value: controller.openEvents.value.toString(),
+              icon: Icons.calendar_today_rounded,
+              iconColor: const Color(0xFF1A6FD4),
+              iconBgColor: const Color(0xFFE3EFFD),
+            ),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: DashboardKpiCard(
               title: 'Activos',
-              value:
-                  controller.openEvents.value.toString(),
-              icon: Icons.warning,
+              value: controller.criticalEvents.value.toString(),
+              icon: Icons.warning_amber_rounded,
+              iconColor: Colors.red,
+              iconBgColor: const Color(0xFFFFECEC),
+            ),
+          ),
+        ]),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(
+            child: DashboardKpiCard(
+              title: 'Familias',
+              value: '957',
+              icon: Icons.people_alt_rounded,
+              iconColor: const Color(0xFF27AE60),
+              iconBgColor: const Color(0xFFE6F9EE),
             ),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: DashboardKpiCard(
-              title: 'Pendientes',
-              value: controller
-                  .pendingEvents.value
-                  .toString(),
-              icon: Icons.assignment,
+              title: 'Viviendas',
+              value: '572',
+              icon: Icons.home_rounded,
+              iconColor: const Color(0xFF16A085),
+              iconBgColor: const Color(0xFFE0F7F4),
             ),
           ),
-        ],
-      );
+        ]),
+      ]);
     }
 
-    // ANALISTA
-    if (role == 'analista') {
-      return Row(
-        children: [
-          Expanded(
-            child: DashboardKpiCard(
-              title: 'Por validar',
-              value:
-                  controller.pendingEvents.value.toString(),
-              icon: Icons.fact_check,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: DashboardKpiCard(
-              title: 'Críticos',
-              value: controller
-                  .criticalEvents.value
-                  .toString(),
-              icon: Icons.analytics,
-            ),
-          ),
-        ],
-      );
-    }
-
-    // DIRECTIVO
-    return Row(
-      children: [
+    if (role == 'coordinador') {
+      return Row(children: [
         Expanded(
           child: DashboardKpiCard(
-            title: 'Eventos mes',
-            value: '36',
-            icon: Icons.bar_chart,
+            title: 'Activos',
+            value: controller.openEvents.value.toString(),
+            icon: Icons.warning_amber_rounded,
+            iconColor: Colors.red,
+            iconBgColor: const Color(0xFFFFECEC),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: DashboardKpiCard(
+            title: 'Pendientes',
+            value: controller.pendingEvents.value.toString(),
+            icon: Icons.assignment_rounded,
+            iconColor: const Color(0xFFF39C12),
+            iconBgColor: const Color(0xFFFFF4E0),
+          ),
+        ),
+      ]);
+    }
+
+    if (role == 'analista') {
+      return Row(children: [
+        Expanded(
+          child: DashboardKpiCard(
+            title: 'Por validar',
+            value: controller.pendingEvents.value.toString(),
+            icon: Icons.fact_check_rounded,
+            iconColor: const Color(0xFF1A6FD4),
+            iconBgColor: const Color(0xFFE3EFFD),
           ),
         ),
         const SizedBox(width: 14),
         Expanded(
           child: DashboardKpiCard(
             title: 'Críticos',
-            value:
-                controller.criticalEvents.value.toString(),
-            icon: Icons.pie_chart,
+            value: controller.criticalEvents.value.toString(),
+            icon: Icons.analytics_rounded,
+            iconColor: Colors.red,
+            iconBgColor: const Color(0xFFFFECEC),
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildRoleModules(String role) {
-    if (role == 'admin') {
-      return Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: const [
-          RoleButtonWidget(
-            title: 'Usuarios',
-            icon: Icons.people,
-          ),
-          RoleButtonWidget(
-            title: 'Config.',
-            icon: Icons.settings,
-          ),
-          RoleButtonWidget(
-            title: 'Reportes',
-            icon: Icons.description,
-          ),
-          RoleButtonWidget(
-            title: 'Dashboard',
-            icon: Icons.bar_chart,
-          ),
-        ],
-      );
+      ]);
     }
 
-    if (role == 'coordinador') {
-      return Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: const [
-          RoleButtonWidget(
-            title: 'Eventos',
-            icon: Icons.warning,
-          ),
-          RoleButtonWidget(
-            title: 'Asignar',
-            icon: Icons.assignment_ind,
-          ),
-          RoleButtonWidget(
-            title: 'Seguimiento',
-            icon: Icons.track_changes,
-          ),
-        ],
-      );
-    }
-
-    if (role == 'analista') {
-      return Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: const [
-          RoleButtonWidget(
-            title: 'Validación',
-            icon: Icons.fact_check,
-          ),
-          RoleButtonWidget(
-            title: 'EDAN',
-            icon: Icons.analytics,
-          ),
-          RoleButtonWidget(
-            title: 'Reportes',
-            icon: Icons.description,
-          ),
-        ],
-      );
-    }
-
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: const [
-        RoleButtonWidget(
-          title: 'Indicadores',
-          icon: Icons.bar_chart,
+    return Row(children: [
+      Expanded(
+        child: DashboardKpiCard(
+          title: 'Eventos mes',
+          value: '36',
+          icon: Icons.bar_chart_rounded,
+          iconColor: const Color(0xFF1B2E6B),
+          iconBgColor: const Color(0xFFE8ECF7),
         ),
-        RoleButtonWidget(
-          title: 'Mapa Riesgo',
-          icon: Icons.map,
+      ),
+      const SizedBox(width: 14),
+      Expanded(
+        child: DashboardKpiCard(
+          title: 'Críticos',
+          value: controller.criticalEvents.value.toString(),
+          icon: Icons.pie_chart_rounded,
+          iconColor: Colors.red,
+          iconBgColor: const Color(0xFFFFECEC),
         ),
-        RoleButtonWidget(
-          title: 'Resumen',
-          icon: Icons.pie_chart,
-        ),
-      ],
-    );
+      ),
+    ]);
   }
 
   Widget _buildRecentEvents(String role) {
     if (role == 'admin') {
-      return const Column(
-        children: [
-          RecentEventItem(
-            title: 'Valledupar',
-            subtitle: 'Incendio Forestal',
-            time: 'Hace 2h',
-            color: Colors.red,
-          ),
-          RecentEventItem(
-            title: 'Pueblo Bello',
-            subtitle: 'Vendaval',
-            time: 'Hace 4h',
-            color: Colors.orange,
-          ),
-          RecentEventItem(
-            title: 'San Diego',
-            subtitle: 'Deslizamiento',
-            time: 'Hace 6h',
-            color: Colors.blue,
-          ),
-        ],
-      );
+      return const Column(children: [
+        RecentEventItem(title: 'Valledupar', subtitle: 'Incendio Forestal', time: 'Hace 2h', color: Colors.red),
+        RecentEventItem(title: 'Pueblo Bello', subtitle: 'Vendaval', time: 'Hace 4h', color: Colors.orange),
+        RecentEventItem(title: 'San Diego', subtitle: 'Deslizamiento', time: 'Hace 6h', color: Colors.blue),
+      ]);
     }
-
     if (role == 'coordinador') {
-      return const Column(
-        children: [
-          RecentEventItem(
-            title: 'Bosconia',
-            subtitle: 'Asignado brigada',
-            time: 'Hace 1h',
-            color: Colors.green,
-          ),
-          RecentEventItem(
-            title: 'La Paz',
-            subtitle: 'Pendiente visita',
-            time: 'Hace 3h',
-            color: Colors.orange,
-          ),
-        ],
-      );
+      return const Column(children: [
+        RecentEventItem(title: 'Bosconia', subtitle: 'Asignado brigada', time: 'Hace 1h', color: Colors.green),
+        RecentEventItem(title: 'La Paz', subtitle: 'Pendiente visita', time: 'Hace 3h', color: Colors.orange),
+      ]);
     }
-
     if (role == 'analista') {
-      return const Column(
-        children: [
-          RecentEventItem(
-            title: 'Manaure',
-            subtitle: 'EDAN requerido',
-            time: 'Hace 1h',
-            color: Colors.red,
-          ),
-          RecentEventItem(
-            title: 'Agustín Codazzi',
-            subtitle: 'Validación técnica',
-            time: 'Hace 5h',
-            color: Colors.blue,
-          ),
-        ],
-      );
+      return const Column(children: [
+        RecentEventItem(title: 'Manaure', subtitle: 'EDAN requerido', time: 'Hace 1h', color: Colors.red),
+        RecentEventItem(title: 'Agustín Codazzi', subtitle: 'Validación técnica', time: 'Hace 5h', color: Colors.blue),
+      ]);
+    }
+    return const Column(children: [
+      RecentEventItem(title: 'Resumen semanal', subtitle: '12 eventos reportados', time: 'Hoy', color: Colors.indigo),
+      RecentEventItem(title: 'Municipios críticos', subtitle: 'Valledupar / Bosconia', time: 'Hoy', color: Colors.red),
+    ]);
+  }
+}
+
+class _MapGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFCDD8EC)
+      ..strokeWidth = 1;
+
+    for (double y = 0; y < size.height; y += 28) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+    for (double x = 0; x < size.width; x += 28) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
 
-    return const Column(
-      children: [
-        RecentEventItem(
-          title: 'Resumen semanal',
-          subtitle: '12 eventos reportados',
-          time: 'Hoy',
-          color: Colors.indigo,
-        ),
-        RecentEventItem(
-          title: 'Municipios críticos',
-          subtitle: 'Valledupar / Bosconia',
-          time: 'Hoy',
-          color: Colors.red,
-        ),
-      ],
-    );
+    final roadPaint = Paint()
+      ..color = const Color(0xFFB8C8E0)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..moveTo(0, size.height * 0.4)
+      ..cubicTo(
+        size.width * 0.3, size.height * 0.3,
+        size.width * 0.6, size.height * 0.6,
+        size.width, size.height * 0.5,
+      );
+    canvas.drawPath(path, roadPaint);
+
+    final path2 = Path()
+      ..moveTo(size.width * 0.2, 0)
+      ..cubicTo(
+        size.width * 0.3, size.height * 0.4,
+        size.width * 0.4, size.height * 0.6,
+        size.width * 0.5, size.height,
+      );
+    canvas.drawPath(path2, roadPaint);
   }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
