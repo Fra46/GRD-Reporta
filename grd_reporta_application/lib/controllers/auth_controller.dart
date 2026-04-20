@@ -1,22 +1,65 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../models/user_model.dart';
+
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Estado reactivo
   RxBool isLoading = false.obs;
+
   Rxn<User> firebaseUser = Rxn<User>();
+  Rxn<UserModel> appUser = Rxn<UserModel>();
 
   @override
   void onInit() {
     super.onInit();
 
-    // Escucha cambios de sesión
     firebaseUser.bindStream(_auth.authStateChanges());
+
+    ever(firebaseUser, _handleAuthChanged);
   }
 
-  // Login
+  Future<void> _handleAuthChanged(User? user) async {
+    if (user == null) {
+      appUser.value = null;
+      Get.offAllNamed('/login');
+      return;
+    }
+
+    await loadUserProfile(user.uid);
+  }
+
+  Future<void> loadUserProfile(String uid) async {
+    try {
+      final doc = await _db.collection('users').doc(uid).get();
+
+      if (!doc.exists) {
+        await logout();
+        Get.snackbar('Error', 'Perfil no encontrado');
+        return;
+      }
+
+      final data = doc.data()!;
+
+      final user = UserModel.fromMap(data, uid);
+
+      if (!user.active) {
+        await logout();
+        Get.snackbar('Acceso denegado', 'Usuario inactivo');
+        return;
+      }
+
+      appUser.value = user;
+
+      Get.offAllNamed('/dashboard');
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudo cargar el perfil');
+    }
+  }
+
   Future<void> login({
     required String email,
     required String password,
@@ -28,22 +71,10 @@ class AuthController extends GetxController {
         email: email.trim(),
         password: password.trim(),
       );
-
-      Get.snackbar(
-        'Éxito',
-        'Inicio de sesión correcto',
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
         'Error',
-        _getFirebaseError(e),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Ocurrió un problema inesperado',
+        e.message ?? 'No fue posible iniciar sesión',
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -51,29 +82,11 @@ class AuthController extends GetxController {
     }
   }
 
-  // Logout
   Future<void> logout() async {
     await _auth.signOut();
   }
 
-  // Usuario actual
-  User? get currentUser => _auth.currentUser;
-
-  // Traductor de errores Firebase
-  String _getFirebaseError(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'user-not-found':
-        return 'Usuario no encontrado';
-      case 'wrong-password':
-        return 'Contraseña incorrecta';
-      case 'invalid-email':
-        return 'Correo inválido';
-      case 'invalid-credential':
-        return 'Credenciales inválidas';
-      case 'too-many-requests':
-        return 'Demasiados intentos. Intenta luego.';
-      default:
-        return 'No fue posible iniciar sesión';
-    }
-  }
+  String get name => appUser.value?.name ?? '';
+  String get email => appUser.value?.email ?? '';
+  String get role => appUser.value?.role ?? '';
 }

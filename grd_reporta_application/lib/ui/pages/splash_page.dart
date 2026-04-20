@@ -20,14 +20,12 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _checkSession() async {
-    await Future.delayed(const Duration(seconds: 2));
+  await Future.delayed(const Duration(seconds: 2));
 
-    if (authController.currentUser != null) {
-      Get.offAllNamed('/dashboard');
-    } else {
-      Get.offAllNamed('/login');
-    }
+  if (authController.firebaseUser.value == null) {
+    Get.offAllNamed('/login');
   }
+}
 
   @override
   Widget build(BuildContext context) {

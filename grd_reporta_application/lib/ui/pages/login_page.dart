@@ -35,10 +35,6 @@ class _LoginPageState extends State<LoginPage> {
       email: emailController.text,
       password: passwordController.text,
     );
-
-    if (authController.currentUser != null) {
-      Get.offAll(() => const DashboardPage());
-    }
   }
 
   @override
