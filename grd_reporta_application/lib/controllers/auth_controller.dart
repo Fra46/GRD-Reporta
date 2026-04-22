@@ -89,4 +89,5 @@ class AuthController extends GetxController {
   String get name => appUser.value?.name ?? '';
   String get email => appUser.value?.email ?? '';
   String get role => appUser.value?.role ?? '';
+  String get uid => appUser.value?.uid ?? '';
 }

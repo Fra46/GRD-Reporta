@@ -3,19 +3,25 @@ import 'package:get/get.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/dashboard_controller.dart';
+import '../../controllers/event_controller.dart';
 
 import '../widgets/dashboard/dashboard_header_widget.dart';
 import '../widgets/dashboard/dashboard_kpi_card.dart';
-import '../widgets/dashboard/recent_event_item.dart';
 import '../widgets/dashboard/dashboard_bottom_nav.dart';
+import '../widgets/events/event_card_widget.dart';
+
+import 'report_event_page.dart';
+import 'event_list_page.dart';
+import 'export_report_page.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final DashboardController controller = Get.put(DashboardController());
-    final AuthController auth = Get.find<AuthController>();
+    final auth = Get.find<AuthController>();
+    final controller = Get.put(DashboardController());
+    Get.put(EventController());
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
@@ -29,6 +35,7 @@ class DashboardPage extends StatelessWidget {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
                   }
+
                   return RefreshIndicator(
                     onRefresh: controller.loadDashboard,
                     child: ListView(
@@ -47,16 +54,36 @@ class DashboardPage extends StatelessWidget {
                         const SizedBox(height: 14),
                         _buildMapPlaceholder(),
                         const SizedBox(height: 28),
-                        const Text(
-                          'Eventos Recientes',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1A1A2E),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Eventos Recientes',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1A1A2E),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Get.to(() => const EventListPage()),
+                              child: const Text(
+                                'Ver todos',
+                                style: TextStyle(color: Color(0xFF1B2E6B)),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 14),
-                        _buildRecentEvents(auth.role),
+                        const SizedBox(height: 8),
+                        Obx(() {
+                          final eventController = Get.find<EventController>();
+                          return Column(
+                            children: eventController.events
+                                .take(3)
+                                .map((e) => EventCardWidget(event: e))
+                                .toList(),
+                          );
+                        }),
                         const SizedBox(height: 140),
                       ],
                     ),
@@ -79,16 +106,23 @@ class DashboardPage extends StatelessWidget {
                   bottom: 90,
                   child: SafeArea(
                     top: false,
-                    child: FloatingActionButton(
-                      backgroundColor: Colors.red,
-                      onPressed: () {
-                        Get.snackbar(
-                          'Nuevo Reporte',
-                          'Próximamente módulo de eventos',
-                          snackPosition: SnackPosition.BOTTOM,
-                        );
-                      },
-                      child: const Icon(Icons.add, color: Colors.white),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FloatingActionButton.small(
+                          heroTag: 'fab_export',
+                          backgroundColor: const Color(0xFF1B2E6B),
+                          onPressed: () => Get.to(() => const ExportReportPage()),
+                          child: const Icon(Icons.download, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(height: 10),
+                        FloatingActionButton(
+                          heroTag: 'fab_report',
+                          backgroundColor: Colors.red,
+                          onPressed: () => Get.to(() => const ReportEventPage()),
+                          child: const Icon(Icons.add, color: Colors.white),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -177,9 +211,9 @@ class DashboardPage extends StatelessWidget {
         Row(children: [
           Expanded(
             child: DashboardKpiCard(
-              title: 'Eventos Hoy',
-              value: controller.openEvents.value.toString(),
-              icon: Icons.calendar_today_rounded,
+              title: 'Eventos',
+              value: controller.totalEventos.toString(),
+              icon: Icons.list_alt_rounded,
               iconColor: const Color(0xFF1A6FD4),
               iconBgColor: const Color(0xFFE3EFFD),
             ),
@@ -187,8 +221,8 @@ class DashboardPage extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: DashboardKpiCard(
-              title: 'Activos',
-              value: controller.criticalEvents.value.toString(),
+              title: 'Críticos',
+              value: controller.totalCriticos.toString(),
               icon: Icons.warning_amber_rounded,
               iconColor: Colors.red,
               iconBgColor: const Color(0xFFFFECEC),
@@ -199,8 +233,8 @@ class DashboardPage extends StatelessWidget {
         Row(children: [
           Expanded(
             child: DashboardKpiCard(
-              title: 'Familias',
-              value: '957',
+              title: 'Afectación',
+              value: controller.totalConAfectacion.toString(),
               icon: Icons.people_alt_rounded,
               iconColor: const Color(0xFF27AE60),
               iconBgColor: const Color(0xFFE6F9EE),
@@ -209,9 +243,9 @@ class DashboardPage extends StatelessWidget {
           const SizedBox(width: 14),
           Expanded(
             child: DashboardKpiCard(
-              title: 'Viviendas',
-              value: '572',
-              icon: Icons.home_rounded,
+              title: 'EDAN',
+              value: controller.totalEdan.toString(),
+              icon: Icons.fact_check_rounded,
               iconColor: const Color(0xFF16A085),
               iconBgColor: const Color(0xFFE0F7F4),
             ),
@@ -224,21 +258,21 @@ class DashboardPage extends StatelessWidget {
       return Row(children: [
         Expanded(
           child: DashboardKpiCard(
-            title: 'Activos',
-            value: controller.openEvents.value.toString(),
-            icon: Icons.warning_amber_rounded,
-            iconColor: Colors.red,
-            iconBgColor: const Color(0xFFFFECEC),
+            title: 'Eventos',
+            value: controller.totalEventos.toString(),
+            icon: Icons.list_alt_rounded,
+            iconColor: const Color(0xFF1A6FD4),
+            iconBgColor: const Color(0xFFE3EFFD),
           ),
         ),
         const SizedBox(width: 14),
         Expanded(
           child: DashboardKpiCard(
-            title: 'Pendientes',
-            value: controller.pendingEvents.value.toString(),
-            icon: Icons.assignment_rounded,
-            iconColor: const Color(0xFFF39C12),
-            iconBgColor: const Color(0xFFFFF4E0),
+            title: 'Críticos',
+            value: controller.totalCriticos.toString(),
+            icon: Icons.warning_amber_rounded,
+            iconColor: Colors.red,
+            iconBgColor: const Color(0xFFFFECEC),
           ),
         ),
       ]);
@@ -248,8 +282,8 @@ class DashboardPage extends StatelessWidget {
       return Row(children: [
         Expanded(
           child: DashboardKpiCard(
-            title: 'Por validar',
-            value: controller.pendingEvents.value.toString(),
+            title: 'EDAN',
+            value: controller.totalEdan.toString(),
             icon: Icons.fact_check_rounded,
             iconColor: const Color(0xFF1A6FD4),
             iconBgColor: const Color(0xFFE3EFFD),
@@ -259,7 +293,7 @@ class DashboardPage extends StatelessWidget {
         Expanded(
           child: DashboardKpiCard(
             title: 'Críticos',
-            value: controller.criticalEvents.value.toString(),
+            value: controller.totalCriticos.toString(),
             icon: Icons.analytics_rounded,
             iconColor: Colors.red,
             iconBgColor: const Color(0xFFFFECEC),
@@ -271,8 +305,8 @@ class DashboardPage extends StatelessWidget {
     return Row(children: [
       Expanded(
         child: DashboardKpiCard(
-          title: 'Eventos mes',
-          value: '36',
+          title: 'Eventos',
+          value: controller.totalEventos.toString(),
           icon: Icons.bar_chart_rounded,
           iconColor: const Color(0xFF1B2E6B),
           iconBgColor: const Color(0xFFE8ECF7),
@@ -282,38 +316,12 @@ class DashboardPage extends StatelessWidget {
       Expanded(
         child: DashboardKpiCard(
           title: 'Críticos',
-          value: controller.criticalEvents.value.toString(),
+          value: controller.totalCriticos.toString(),
           icon: Icons.pie_chart_rounded,
           iconColor: Colors.red,
           iconBgColor: const Color(0xFFFFECEC),
         ),
       ),
-    ]);
-  }
-
-  Widget _buildRecentEvents(String role) {
-    if (role == 'admin') {
-      return const Column(children: [
-        RecentEventItem(title: 'Valledupar', subtitle: 'Incendio Forestal', time: 'Hace 2h', color: Colors.red),
-        RecentEventItem(title: 'Pueblo Bello', subtitle: 'Vendaval', time: 'Hace 4h', color: Colors.orange),
-        RecentEventItem(title: 'San Diego', subtitle: 'Deslizamiento', time: 'Hace 6h', color: Colors.blue),
-      ]);
-    }
-    if (role == 'coordinador') {
-      return const Column(children: [
-        RecentEventItem(title: 'Bosconia', subtitle: 'Asignado brigada', time: 'Hace 1h', color: Colors.green),
-        RecentEventItem(title: 'La Paz', subtitle: 'Pendiente visita', time: 'Hace 3h', color: Colors.orange),
-      ]);
-    }
-    if (role == 'analista') {
-      return const Column(children: [
-        RecentEventItem(title: 'Manaure', subtitle: 'EDAN requerido', time: 'Hace 1h', color: Colors.red),
-        RecentEventItem(title: 'Agustín Codazzi', subtitle: 'Validación técnica', time: 'Hace 5h', color: Colors.blue),
-      ]);
-    }
-    return const Column(children: [
-      RecentEventItem(title: 'Resumen semanal', subtitle: '12 eventos reportados', time: 'Hoy', color: Colors.indigo),
-      RecentEventItem(title: 'Municipios críticos', subtitle: 'Valledupar / Bosconia', time: 'Hoy', color: Colors.red),
     ]);
   }
 }

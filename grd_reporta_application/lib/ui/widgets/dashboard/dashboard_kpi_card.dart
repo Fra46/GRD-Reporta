@@ -19,8 +19,7 @@ class DashboardKpiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color resolvedIconColor = iconColor ?? const Color(0xFF1B2E6B);
-    final Color resolvedIconBg =
-        iconBgColor ?? resolvedIconColor.withOpacity(0.12);
+    final Color resolvedIconBg = iconBgColor ?? resolvedIconColor.withOpacity(0.12);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -41,7 +40,6 @@ class DashboardKpiCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Ícono en recuadro de color
               Container(
                 width: 42,
                 height: 42,
@@ -51,18 +49,9 @@ class DashboardKpiCard extends StatelessWidget {
                 ),
                 child: Icon(icon, color: resolvedIconColor, size: 22),
               ),
-              // Flecha tendencia verde
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.arrow_upward, color: Color(0xFF2ECC71), size: 14),
-                  Text(
-                    '',
-                    style: TextStyle(
-                      color: Color(0xFF2ECC71),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                 ],
               ),
             ],
