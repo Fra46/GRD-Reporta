@@ -20,12 +20,12 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _checkSession() async {
-  await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
 
-  if (authController.firebaseUser.value == null) {
-    Get.offAllNamed('/login');
+    if (authController.firebaseUser.value == null) {
+      Get.offAllNamed('/login');
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -36,30 +36,27 @@ class _SplashPageState extends State<SplashPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.warning_amber_rounded,
-              size: 90,
-              color: Colors.orange,
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Image.asset('assets/images/ungrd_logo.jpg', height: 80),
             ),
 
             const SizedBox(height: 20),
 
             const Text(
               'GRD Reporta',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 8),
 
             Text(
-              'Gestión del Riesgo de Desastres',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade700,
-              ),
+              'Sistema de Reportes de Emergencias · Cesar',
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
             ),
 
             const SizedBox(height: 40),

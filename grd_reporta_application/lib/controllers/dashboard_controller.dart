@@ -1,11 +1,14 @@
 import 'package:get/get.dart';
 
-class DashboardController extends GetxController {
-  RxBool isLoading = true.obs;
+import 'event_controller.dart';
 
-  RxInt openEvents = 0.obs;
-  RxInt criticalEvents = 0.obs;
-  RxInt pendingEvents = 0.obs;
+class DashboardController
+    extends GetxController {
+  final EventController events =
+      Get.find<EventController>();
+
+  RxBool isLoading =
+      true.obs;
 
   @override
   void onInit() {
@@ -13,18 +16,31 @@ class DashboardController extends GetxController {
     loadDashboard();
   }
 
-  Future<void> loadDashboard() async {
-    try {
-      isLoading.value = true;
+  Future<void>
+      loadDashboard() async {
+    isLoading.value = true;
 
-      await Future.delayed(const Duration(seconds: 1));
+    await events.loadEvents();
 
-      // Datos temporales simulados
-      openEvents.value = 12;
-      criticalEvents.value = 5;
-      pendingEvents.value = 7;
-    } finally {
-      isLoading.value = false;
-    }
+    isLoading.value =
+        false;
   }
+
+  int get totalEventos =>
+      events.totalEventos;
+
+  int get totalCriticos =>
+      events.totalCriticos;
+
+  int get totalConAfectacion =>
+      events.totalConAfectacion;
+
+  int get totalEdan =>
+      events.totalEdan;
+
+  int get totalAbiertos =>
+      events.totalAbiertos;
+
+  get recientes =>
+      events.events.take(5).toList();
 }
