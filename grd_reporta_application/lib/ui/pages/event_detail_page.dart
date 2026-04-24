@@ -6,6 +6,7 @@ import '../../controllers/event_controller.dart';
 import '../widgets/events/event_header_widget.dart';
 import '../widgets/events/info_section_widget.dart';
 import '../widgets/events/detail_item_widget.dart';
+import '../widgets/evidence_picker_widget.dart';
 
 class EventDetailPage extends StatelessWidget {
   // Recibimos solo el ID — el widget siempre lee el estado fresco del controller
@@ -215,11 +216,19 @@ class EventDetailPage extends StatelessWidget {
                       ),
                     ],
 
-                    // Fotos
-                    if (event.fotosUrls.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      _FotosSection(fotosUrls: event.fotosUrls),
-                    ],
+                    // Fotos — usa EvidencePickerWidget para ver Y agregar
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [
+                          BoxShadow(blurRadius: 8, color: Colors.black12)
+                        ],
+                      ),
+                      child: EvidencePickerWidget(eventId: eventId),
+                    ),
 
                     // Cambio de estado
                     const SizedBox(height: 24),
@@ -243,120 +252,6 @@ class EventDetailPage extends StatelessWidget {
       '${d.day.toString().padLeft(2, '0')}/'
       '${d.month.toString().padLeft(2, '0')}/'
       '${d.year}';
-}
-
-// ─── Galería de fotos ───────────────────────────────────────────
-class _FotosSection extends StatelessWidget {
-  final List<String> fotosUrls;
-  const _FotosSection({required this.fotosUrls});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(blurRadius: 8, color: Colors.black12)],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.photo_library_rounded,
-                  color: Color(0xFF1B2E6B), size: 18),
-              const SizedBox(width: 8),
-              Text(
-                'Evidencia fotográfica (${fotosUrls.length})',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: fotosUrls.length,
-            itemBuilder: (context, i) => GestureDetector(
-              onTap: () => _verFotoCompleta(context, i),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  fotosUrls[i],
-                  fit: BoxFit.cover,
-                  loadingBuilder: (_, child, progress) {
-                    if (progress == null) return child;
-                    return Container(
-                      color: const Color(0xFFE8EEF7),
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    );
-                  },
-                  errorBuilder: (_, __, ___) => Container(
-                    color: const Color(0xFFE8EEF7),
-                    child: const Icon(Icons.broken_image_rounded,
-                        color: Colors.grey),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _verFotoCompleta(BuildContext context, int indice) {
-    showDialog(
-      context: context,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: EdgeInsets.zero,
-        child: Stack(
-          children: [
-            PageView.builder(
-              controller: PageController(initialPage: indice),
-              itemCount: fotosUrls.length,
-              itemBuilder: (_, i) => InteractiveViewer(
-                child: Image.network(
-                  fotosUrls[i],
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 40,
-              right: 16,
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: const BoxDecoration(
-                    color: Colors.black54,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close_rounded,
-                      color: Colors.white, size: 20),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // ─── Badge criticidad ───────────────────────────────────────────

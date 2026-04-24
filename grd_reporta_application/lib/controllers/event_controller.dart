@@ -168,6 +168,50 @@ class EventController extends GetxController {
   }
 
   // =====================================
+  // AGREGAR FOTO A EVENTO EXISTENTE
+  // =====================================
+
+  Future<void> addFotoToEvent({
+    required String eventId,
+    required File foto,
+  }) async {
+    try {
+      isUploading.value = true;
+      uploadStatus.value = 'Subiendo foto...';
+      uploadProgress.value = 0;
+
+      final url = await CloudinaryService.uploadImage(
+        foto,
+        eventoId: eventId,
+        onProgress: (p) => uploadProgress.value = p,
+      );
+
+      // Actualizar Firestore con arrayUnion
+      await _db.collection('events').doc(eventId).update({
+        'fotosUrls': FieldValue.arrayUnion([url]),
+      });
+
+      // Actualizar lista local
+      final idx = events.indexWhere((e) => e.id == eventId);
+      if (idx != -1) {
+        final nuevasFotos = [...events[idx].fotosUrls, url];
+        events[idx] = events[idx].copyWith(fotosUrls: nuevasFotos);
+        events.refresh();
+      }
+
+      Get.snackbar('Foto agregada', 'Evidencia guardada correctamente',
+          snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudo subir la foto',
+          snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isUploading.value = false;
+      uploadProgress.value = 0;
+      uploadStatus.value = '';
+    }
+  }
+
+  // =====================================
   // CAMBIAR ESTADO
   // =====================================
 
