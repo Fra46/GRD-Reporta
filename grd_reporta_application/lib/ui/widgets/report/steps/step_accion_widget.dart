@@ -7,6 +7,8 @@ class StepAccionWidget extends StatelessWidget {
   final TextEditingController accionController;
   final TextEditingController observacionController;
   final String? ubicacionGps;
+  final double? latitud;
+  final double? longitud;
   final bool loadingGps;
   final VoidCallback onObtenerUbicacion;
 
@@ -16,6 +18,8 @@ class StepAccionWidget extends StatelessWidget {
     required this.accionController,
     required this.observacionController,
     required this.ubicacionGps,
+    this.latitud,
+    this.longitud,
     required this.loadingGps,
     required this.onObtenerUbicacion,
   });
@@ -35,7 +39,9 @@ class StepAccionWidget extends StatelessWidget {
             controller: accionController,
             maxLines: 4,
             decoration: reportFieldDeco(
-                'Describa la acción tomada...', Icons.assignment_outlined),
+              'Describa la acción tomada...',
+              Icons.assignment_outlined,
+            ),
             validator: (v) => v!.trim().isEmpty ? 'Requerido' : null,
           ),
           const SizedBox(height: 16),
@@ -44,8 +50,10 @@ class StepAccionWidget extends StatelessWidget {
           TextFormField(
             controller: observacionController,
             maxLines: 3,
-            decoration:
-                reportFieldDeco('Observaciones...', Icons.note_outlined),
+            decoration: reportFieldDeco(
+              'Observaciones...',
+              Icons.note_outlined,
+            ),
           ),
           const SizedBox(height: 16),
           const _Label('Ubicación GPS'),
@@ -66,9 +74,14 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) => Text(text,
-      style: const TextStyle(
-          fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)));
+  Widget build(BuildContext context) => Text(
+    text,
+    style: const TextStyle(
+      fontSize: 17,
+      fontWeight: FontWeight.bold,
+      color: Color(0xFF1A1A2E),
+    ),
+  );
 }
 
 class _Label extends StatelessWidget {
@@ -76,7 +89,12 @@ class _Label extends StatelessWidget {
   const _Label(this.text);
 
   @override
-  Widget build(BuildContext context) => Text(text,
-      style: const TextStyle(
-          fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF555567)));
+  Widget build(BuildContext context) => Text(
+    text,
+    style: const TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      color: Color(0xFF555567),
+    ),
+  );
 }
