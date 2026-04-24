@@ -5,11 +5,13 @@ import './pages/login_page.dart';
 import './pages/dashboard_page.dart';
 import './pages/splash_page.dart';
 import './pages/analytics_page.dart';
+import './pages/onboarding_page.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/event_controller.dart';
 import '../../controllers/sync_controller.dart';
 import '../../controllers/analytics_controller.dart';
+import 'theme.dart';
 
 class GrdReportaApp extends StatelessWidget {
   const GrdReportaApp({super.key});
@@ -24,17 +26,13 @@ class GrdReportaApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'GRD Reporta',
-      theme: ThemeData(
-        useMaterial3: true,
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.grey.shade100,
-        appBarTheme: const AppBarTheme(centerTitle: true),
-      ),
-
+      theme: AppTheme.lightTheme(),
+      defaultTransition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 320),
       initialRoute: '/splash',
-
       getPages: [
         GetPage(name: '/splash', page: () => const SplashPage()),
+        GetPage(name: '/onboarding', page: () => const OnboardingPage()),
         GetPage(name: '/login', page: () => const LoginPage()),
         GetPage(name: '/dashboard', page: () => const DashboardPage()),
         GetPage(name: '/analytics', page: () => const AnalyticsPage()),

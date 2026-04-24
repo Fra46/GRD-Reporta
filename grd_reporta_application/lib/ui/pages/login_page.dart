@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../theme.dart';
+import '../widgets/shared/app_button.dart';
 import '../../controllers/auth_controller.dart';
 
 class LoginPage extends StatefulWidget {
@@ -33,8 +35,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    const Color ungrdBlue = Color(0xFF1B2E6B);
-    const Color ungrdYellow = Color(0xFFFFC107);
+    const Color ungrdBlue = AppColors.primary;
+    const Color ungrdYellow = AppColors.secondary;
 
     return Scaffold(
       backgroundColor: ungrdBlue,
@@ -83,8 +85,16 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(width: 28, height: 3, color: ungrdYellow),
-                      Container(width: 28, height: 3, color: const Color(0xFF003087)),
-                      Container(width: 28, height: 3, color: const Color(0xFFCE1126)),
+                      Container(
+                        width: 28,
+                        height: 3,
+                        color: const Color(0xFF003087),
+                      ),
+                      Container(
+                        width: 28,
+                        height: 3,
+                        color: const Color(0xFFCE1126),
+                      ),
                     ],
                   ),
                 ],
@@ -136,23 +146,35 @@ class _LoginPageState extends State<LoginPage> {
                                 hintText: 'gestiondelriesgo@cesar.gov.co',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Color(0xFFDDDDE8)),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFDDDDE8),
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Color(0xFFDDDDE8)),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFDDDDE8),
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: ungrdBlue, width: 2),
+                                  borderSide: const BorderSide(
+                                    color: ungrdBlue,
+                                    width: 2,
+                                  ),
                                 ),
-                                prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF888899)),
+                                prefixIcon: const Icon(
+                                  Icons.email_outlined,
+                                  color: Color(0xFF888899),
+                                ),
                                 filled: true,
                                 fillColor: const Color(0xFFF7F8FC),
                               ),
                               validator: (value) {
-                                if (value == null || value.trim().isEmpty) return 'Ingrese su correo';
-                                if (!GetUtils.isEmail(value.trim())) return 'Correo inválido';
+                                if (value == null || value.trim().isEmpty)
+                                  return 'Ingrese su correo';
+                                if (!GetUtils.isEmail(value.trim()))
+                                  return 'Correo inválido';
                                 return null;
                               },
                             ),
@@ -173,21 +195,35 @@ class _LoginPageState extends State<LoginPage> {
                                 hintText: '••••••••',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Color(0xFFDDDDE8)),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFDDDDE8),
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Color(0xFFDDDDE8)),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFDDDDE8),
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: ungrdBlue, width: 2),
+                                  borderSide: const BorderSide(
+                                    color: ungrdBlue,
+                                    width: 2,
+                                  ),
                                 ),
-                                prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF888899)),
+                                prefixIcon: const Icon(
+                                  Icons.lock_outline,
+                                  color: Color(0xFF888899),
+                                ),
                                 suffixIcon: IconButton(
-                                  onPressed: () => setState(() => obscurePassword = !obscurePassword),
+                                  onPressed: () => setState(
+                                    () => obscurePassword = !obscurePassword,
+                                  ),
                                   icon: Icon(
-                                    obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    obscurePassword
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
                                     color: const Color(0xFF888899),
                                   ),
                                 ),
@@ -195,47 +231,48 @@ class _LoginPageState extends State<LoginPage> {
                                 fillColor: const Color(0xFFF7F8FC),
                               ),
                               validator: (value) {
-                                if (value == null || value.trim().isEmpty) return 'Ingrese su contraseña';
-                                if (value.trim().length < 6) return 'Mínimo 6 caracteres';
+                                if (value == null || value.trim().isEmpty)
+                                  return 'Ingrese su contraseña';
+                                if (value.trim().length < 6)
+                                  return 'Mínimo 6 caracteres';
                                 return null;
                               },
                             ),
                             const SizedBox(height: 28),
                             Obx(
-                              () => SizedBox(
-                                height: 52,
-                                child: ElevatedButton(
-                                  onPressed: authController.isLoading.value ? null : _login,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ungrdBlue,
-                                    foregroundColor: Colors.white,
-                                    disabledBackgroundColor: ungrdBlue.withOpacity(0.4),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                    elevation: 0,
-                                  ),
-                                  child: authController.isLoading.value
-                                      ? const SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-                                        )
-                                      : const Text('Ingresar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                                ),
+                              () => AppButton(
+                                label: 'Ingresar',
+                                busy: authController.isLoading.value,
+                                onPressed: authController.isLoading.value
+                                    ? () {}
+                                    : _login,
                               ),
                             ),
                             const SizedBox(height: 16),
                             TextButton(
                               onPressed: () {},
-                              style: TextButton.styleFrom(foregroundColor: ungrdBlue),
-                              child: const Text('¿Olvidaste tu contraseña?', style: TextStyle(fontSize: 14)),
+                              style: TextButton.styleFrom(
+                                foregroundColor: ungrdBlue,
+                              ),
+                              child: const Text(
+                                '¿Olvidaste tu contraseña?',
+                                style: TextStyle(fontSize: 14),
+                              ),
                             ),
                             const SizedBox(height: 16),
-                            const Divider(height: 24, thickness: 1, color: Color(0xFFDDDEEA)),
+                            const Divider(
+                              height: 24,
+                              thickness: 1,
+                              color: Color(0xFFDDDEEA),
+                            ),
                             const SizedBox(height: 12),
                             const Text(
                               'ODGRD Cesar - Gobernacion del Cesar',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Color(0xFF777777), fontSize: 12),
+                              style: TextStyle(
+                                color: Color(0xFF777777),
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),

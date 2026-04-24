@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../controllers/auth_controller.dart';
+import 'login_page.dart';
+import 'dashboard_page.dart';
+import 'onboarding_page.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -21,9 +25,19 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<void> _checkSession() async {
     await Future.delayed(const Duration(seconds: 2));
+    final settings = Hive.box('settings');
+    final hasSeenOnboarding =
+        settings.get('seen_onboarding', defaultValue: false) as bool;
+
+    if (!hasSeenOnboarding) {
+      Get.offAll(() => const OnboardingPage());
+      return;
+    }
 
     if (authController.firebaseUser.value == null) {
-      Get.offAllNamed('/login');
+      Get.offAll(() => const LoginPage());
+    } else {
+      Get.offAll(() => const DashboardPage());
     }
   }
 

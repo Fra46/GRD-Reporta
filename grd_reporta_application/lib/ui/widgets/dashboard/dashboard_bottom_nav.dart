@@ -39,7 +39,11 @@ class DashboardBottomNav extends StatelessWidget {
           _NavItem(
             icon: Icons.bar_chart_rounded,
             label: 'Analíticas',
-            onTap: () => Get.to(() => const AnalyticsPage()),
+            onTap: () => Get.to(
+              () => const AnalyticsPage(),
+              transition: Transition.rightToLeftWithFade,
+              duration: const Duration(milliseconds: 320),
+            ),
           ),
           const _LogoutButton(),
         ],
