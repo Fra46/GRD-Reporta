@@ -21,7 +21,7 @@ class ReportEventPage extends StatefulWidget {
 }
 
 class _ReportEventPageState extends State<ReportEventPage> {
-  final EventController controller = Get.put(EventController());
+  final EventController controller = Get.find<EventController>();
 
   final formKey1 = GlobalKey<FormState>();
   final formKey2 = GlobalKey<FormState>();
@@ -183,6 +183,7 @@ class _ReportEventPageState extends State<ReportEventPage> {
       descripcion: descripcionController.text,
       criticidad: criticidad,
       hayAfectacion: hayAfectacion,
+      accionTomada: accionController.text,
       observacion: observacionController.text,
       personasAfectadas: int.tryParse(personasController.text) ?? 0,
       familiasAfectadas: int.tryParse(familiasController.text) ?? 0,

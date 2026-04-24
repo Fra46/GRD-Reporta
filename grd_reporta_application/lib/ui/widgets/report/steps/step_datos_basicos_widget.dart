@@ -13,18 +13,48 @@ class StepDatosBasicosWidget extends StatelessWidget {
   final void Function(String?) onTipoChanged;
   final VoidCallback onPickFecha;
 
-  static const List<String> _corregimientos = [
-    'Agustín Codazzi', 'Astrea', 'Becerril', 'Bosconia', 'Chimichagua',
-    'Chiriguaná', 'Curumaní', 'El Copey', 'El Paso', 'Gamarra',
-    'González', 'La Gloria', 'La Jagua de Ibirico', 'La Paz', 'Manaure',
-    'Pailitas', 'Pelaya', 'Pueblo Bello', 'Río de Oro', 'San Alberto',
-    'San Diego', 'San Martín', 'Tamalameque', 'Valledupar', 'Venezuela',
+  // 25 municipios oficiales del Cesar
+  static const List<String> _municipios = [
+    'Aguachica',
+    'Agustín Codazzi',
+    'Astrea',
+    'Becerril',
+    'Bosconia',
+    'Chimichagua',
+    'Chiriguaná',
+    'Curumaní',
+    'El Copey',
+    'El Paso',
+    'Gamarra',
+    'González',
+    'La Gloria',
+    'La Jagua de Ibirico',
+    'La Paz',
+    'Manaure Balcón del Cesar',
+    'Pailitas',
+    'Pelaya',
+    'Pueblo Bello',
+    'Río de Oro',
+    'San Alberto',
+    'San Diego',
+    'San Martín',
+    'Tamalameque',
+    'Valledupar',
   ];
 
   static const List<String> _tiposEvento = [
-    'Vendaval', 'Inundación', 'Deslizamiento', 'Incendio Forestal',
-    'Incendio Estructural', 'Sismo', 'Granizada', 'Sequía',
-    'Accidente de Tránsito', 'Otro',
+    'Vendaval',
+    'Inundación',
+    'Deslizamiento',
+    'Incendio Forestal',
+    'Incendio Estructural',
+    'Sismo',
+    'Granizada',
+    'Sequía',
+    'Accidente de Tránsito',
+    'Contaminación',
+    'Explosión',
+    'Otro',
   ];
 
   const StepDatosBasicosWidget({
@@ -49,27 +79,50 @@ class StepDatosBasicosWidget extends StatelessWidget {
         children: [
           const _SectionTitle('Datos del Evento'),
           const SizedBox(height: 16),
-          const _Label('Municipio'),
+          const _Label('Municipio *'),
           const SizedBox(height: 8),
           ReportDropdownWidget<String>(
             value: municipioSeleccionado,
-            items: const ['Valledupar'],
-            hint: 'Municipio',
+            items: _municipios,
+            hint: 'Seleccionar municipio',
             icon: Icons.location_city_rounded,
             onChanged: onMunicipioChanged,
+            required: true,
           ),
           const SizedBox(height: 16),
           const _Label('Corregimiento / Vereda'),
           const SizedBox(height: 8),
           ReportDropdownWidget<String>(
             value: corregimientoSeleccionado,
-            items: _corregimientos,
-            hint: 'Seleccionar corregimiento',
+            items: const [
+              'Área urbana',
+              'Corregimiento / Vereda',
+              'La Mata',
+              'San Roque',
+              'Caracolicito',
+              'Las Flores',
+              'Rinconhondo',
+              'Simaña',
+              'Casacará',
+              'Cuatro Vientos',
+              'La Loma',
+              'Plan Bonito',
+              'El Hatillo',
+              'Badillo',
+              'La Junta',
+              'Los Venados',
+              'Atánquez',
+              'Guatapurí',
+              'Nabusímake',
+              'Patillal',
+              'Otro',
+            ],
+            hint: 'Seleccionar (opcional)',
             icon: Icons.map_outlined,
             onChanged: onCorregimientoChanged,
           ),
           const SizedBox(height: 16),
-          const _Label('Tipo de Evento'),
+          const _Label('Tipo de Evento *'),
           const SizedBox(height: 8),
           ReportDropdownWidget<String>(
             value: tipoEvento,
@@ -80,14 +133,16 @@ class StepDatosBasicosWidget extends StatelessWidget {
             required: true,
           ),
           const SizedBox(height: 16),
-          const _Label('Fecha del Evento'),
+          const _Label('Fecha del Evento *'),
           const SizedBox(height: 8),
           TextFormField(
             controller: fechaController,
             readOnly: true,
             onTap: onPickFecha,
-            decoration: reportFieldDeco('Seleccionar fecha',
-                Icons.calendar_today_rounded),
+            decoration: reportFieldDeco(
+              'Seleccionar fecha',
+              Icons.calendar_today_rounded,
+            ),
             validator: (v) =>
                 v == null || v.isEmpty ? 'Seleccione la fecha' : null,
           ),
@@ -102,11 +157,14 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) => Text(text,
-      style: const TextStyle(
+  Widget build(BuildContext context) => Text(
+        text,
+        style: const TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF1A1A2E)));
+          color: Color(0xFF1A1A2E),
+        ),
+      );
 }
 
 class _Label extends StatelessWidget {
@@ -114,9 +172,12 @@ class _Label extends StatelessWidget {
   const _Label(this.text);
 
   @override
-  Widget build(BuildContext context) => Text(text,
-      style: const TextStyle(
+  Widget build(BuildContext context) => Text(
+        text,
+        style: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF555567)));
+          color: Color(0xFF555567),
+        ),
+      );
 }

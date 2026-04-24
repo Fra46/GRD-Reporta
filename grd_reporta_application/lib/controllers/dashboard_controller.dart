@@ -1,14 +1,25 @@
 import 'package:get/get.dart';
-
 import 'event_controller.dart';
 
-class DashboardController
-    extends GetxController {
-  final EventController events =
-      Get.find<EventController>();
+class DashboardController extends GetxController {
+  RxBool isLoading = true.obs;
 
-  RxBool isLoading =
-      true.obs;
+  EventController get _ec => Get.find<EventController>();
+
+  // Getters que usa DashboardPage
+  int get totalEventos => _ec.totalEventos;
+  int get totalCriticos => _ec.totalCriticos;
+  int get totalConAfectacion => _ec.totalConAfectacion;
+  int get totalEdan => _ec.totalEdan;
+  int get totalAbiertos => _ec.totalAbiertos;
+  int get totalEnProceso => _ec.totalEnProceso;
+  int get totalFamilias => _ec.totalFamilias;
+  int get totalViviendas => _ec.totalViviendas;
+
+  // Aliases usados por versiones anteriores del dashboard
+  int get openEvents => _ec.totalAbiertos;
+  int get criticalEvents => _ec.totalCriticos;
+  int get pendingEvents => _ec.totalEnProceso;
 
   @override
   void onInit() {
@@ -16,31 +27,12 @@ class DashboardController
     loadDashboard();
   }
 
-  Future<void>
-      loadDashboard() async {
-    isLoading.value = true;
-
-    await events.loadEvents();
-
-    isLoading.value =
-        false;
+  Future<void> loadDashboard() async {
+    try {
+      isLoading.value = true;
+      await _ec.loadEvents();
+    } finally {
+      isLoading.value = false;
+    }
   }
-
-  int get totalEventos =>
-      events.totalEventos;
-
-  int get totalCriticos =>
-      events.totalCriticos;
-
-  int get totalConAfectacion =>
-      events.totalConAfectacion;
-
-  int get totalEdan =>
-      events.totalEdan;
-
-  int get totalAbiertos =>
-      events.totalAbiertos;
-
-  get recientes =>
-      events.events.take(5).toList();
 }
