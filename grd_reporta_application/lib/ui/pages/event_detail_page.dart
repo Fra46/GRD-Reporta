@@ -363,7 +363,7 @@ class _AfectacionChart extends StatelessWidget {
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

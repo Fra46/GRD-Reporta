@@ -22,7 +22,7 @@ class ReportDropdownWidget<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       decoration: reportFieldDeco(hint, icon),
       isExpanded: true,
       items: items
