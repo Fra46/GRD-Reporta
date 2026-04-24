@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../controllers/event_controller.dart';
 import '../../models/event_model.dart';
 import '../../services/location_service.dart';
+import 'dashboard_page.dart';
 import '../widgets/report/report_header_widget.dart';
 import '../widgets/report/report_stepper_widget.dart';
 import '../widgets/report/report_bottom_buttons_widget.dart';
@@ -237,7 +238,7 @@ class _ReportEventPageState extends State<ReportEventPage> {
       );
     }
 
-    Get.back();
+    Get.offAll(() => const DashboardPage());
   }
 
   void _next() {

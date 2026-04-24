@@ -295,9 +295,12 @@ class _AfectacionChart extends StatelessWidget {
         const Color(0xFF5589FF),
       ),
     ];
+
     final maxValue = items
         .map((item) => item.value)
         .fold<double>(0, (prev, val) => val > prev ? val : prev);
+    final chartMax = maxValue > 0 ? (maxValue * 1.2).ceilToDouble() : 5.0;
+    final lineCount = 5;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -317,53 +320,96 @@ class _AfectacionChart extends StatelessWidget {
               color: Color(0xFF1A1A2E),
             ),
           ),
-          const SizedBox(height: 12),
-          ...items.map((item) {
-            final widthFactor = maxValue > 0 ? item.value / maxValue : 0.0;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item.label,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF444455),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 240,
+            child: Stack(
+              children: [
+                Column(
+                  children: List.generate(lineCount, (index) {
+                    return Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: index == lineCount - 1
+                                  ? Colors.transparent
+                                  : const Color(0xFFE8EEF7),
+                              width: 1,
+                            ),
                           ),
                         ),
                       ),
-                      Text(
-                        item.value.toInt().toString(),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B2E6B),
+                    );
+                  }),
+                ),
+                Positioned.fill(
+                  bottom: 28,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: items.map((item) {
+                      final barHeight = chartMax > 0
+                          ? (item.value / chartMax) * 170
+                          : 0.0;
+                      return Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: 30,
+                              height: barHeight,
+                              decoration: BoxDecoration(
+                                color: item.color,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              item.value.toInt().toString(),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1B2E6B),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              item.label,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF444455),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      );
+                    }).toList(),
                   ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      height: 10,
-                      color: const Color(0xFFE8EEF7),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: widthFactor,
-                        child: Container(color: item.color),
-                      ),
-                    ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(lineCount, (index) {
+              final valueLabel =
+                  ((chartMax / (lineCount - 1)) * (lineCount - 1 - index))
+                      .toInt();
+              return Expanded(
+                child: Text(
+                  valueLabel.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF9FA3B2),
                   ),
-                ],
-              ),
-            );
-          }),
+                ),
+              );
+            }),
+          ),
         ],
       ),
     );
