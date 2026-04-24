@@ -83,8 +83,7 @@ class _ReportEventPageState extends State<ReportEventPage> {
       initialDate: DateTime.now(),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme:
-              const ColorScheme.light(primary: Color(0xFF1B2E6B)),
+          colorScheme: const ColorScheme.light(primary: Color(0xFF1B2E6B)),
         ),
         child: child!,
       ),
@@ -138,8 +137,7 @@ class _ReportEventPageState extends State<ReportEventPage> {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => SafeArea(
         child: Column(
@@ -156,17 +154,20 @@ class _ReportEventPageState extends State<ReportEventPage> {
             ),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.camera_alt_rounded,
-                  color: Color(0xFF1B2E6B)),
+              leading: const Icon(
+                Icons.camera_alt_rounded,
+                color: Color(0xFF1B2E6B),
+              ),
               title: const Text('Tomar foto'),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library_rounded,
-                  color: Color(0xFF1B2E6B)),
+              leading: const Icon(
+                Icons.photo_library_rounded,
+                color: Color(0xFF1B2E6B),
+              ),
               title: const Text('Galería'),
-              onTap: () =>
-                  Navigator.pop(context, ImageSource.gallery),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             const SizedBox(height: 8),
           ],
@@ -198,18 +199,12 @@ class _ReportEventPageState extends State<ReportEventPage> {
       hayAfectacion: hayAfectacion,
       accionTomada: accionController.text,
       observacion: observacionController.text,
-      personasAfectadas:
-          int.tryParse(personasController.text) ?? 0,
-      familiasAfectadas:
-          int.tryParse(familiasController.text) ?? 0,
-      familiasIndirectas:
-          int.tryParse(indirectasController.text) ?? 0,
-      viviendasAfectadas:
-          int.tryParse(viviendasAController.text) ?? 0,
-      viviendasDestruidas:
-          int.tryParse(viviendasDController.text) ?? 0,
-      hectareasAfectadas:
-          double.tryParse(hectareasController.text) ?? 0,
+      personasAfectadas: int.tryParse(personasController.text) ?? 0,
+      familiasAfectadas: int.tryParse(familiasController.text) ?? 0,
+      familiasIndirectas: int.tryParse(indirectasController.text) ?? 0,
+      viviendasAfectadas: int.tryParse(viviendasAController.text) ?? 0,
+      viviendasDestruidas: int.tryParse(viviendasDController.text) ?? 0,
+      hectareasAfectadas: double.tryParse(hectareasController.text) ?? 0,
       fotos: fotos.map((f) => File(f.path)).toList(),
     );
     Get.back();
@@ -242,21 +237,18 @@ class _ReportEventPageState extends State<ReportEventPage> {
               ReportStepperWidget(currentStep: currentStep),
               Expanded(
                 child: SingleChildScrollView(
-                  padding:
-                      const EdgeInsets.fromLTRB(20, 24, 20, 20),
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     child: _buildCurrentStep(),
                   ),
                 ),
               ),
-              Obx(
-                () => ReportBottomButtonsWidget(
-                  currentStep: currentStep,
-                  isLoading: controller.isLoading,
-                  onNext: _next,
-                  onBack: _back,
-                ),
+              ReportBottomButtonsWidget(
+                currentStep: currentStep,
+                isLoading: controller.isLoading,
+                onNext: _next,
+                onBack: _back,
               ),
             ],
           ),
@@ -309,10 +301,8 @@ class _ReportEventPageState extends State<ReportEventPage> {
                           borderRadius: BorderRadius.circular(8),
                           child: LinearProgressIndicator(
                             value: controller.uploadProgress.value,
-                            backgroundColor:
-                                const Color(0xFFE8ECF7),
-                            valueColor:
-                                const AlwaysStoppedAnimation<Color>(
+                            backgroundColor: const Color(0xFFE8ECF7),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
                               Color(0xFF1B2E6B),
                             ),
                             minHeight: 8,
@@ -340,8 +330,7 @@ class _ReportEventPageState extends State<ReportEventPage> {
           corregimientoSeleccionado: corregimientoSeleccionado,
           tipoEvento: tipoEvento,
           fechaController: fechaController,
-          onMunicipioChanged: (v) =>
-              setState(() => municipioSeleccionado = v),
+          onMunicipioChanged: (v) => setState(() => municipioSeleccionado = v),
           onCorregimientoChanged: (v) =>
               setState(() => corregimientoSeleccionado = v),
           onTipoChanged: (v) => setState(() => tipoEvento = v!),
@@ -360,10 +349,8 @@ class _ReportEventPageState extends State<ReportEventPage> {
           viviendasAController: viviendasAController,
           viviendasDController: viviendasDController,
           hectareasController: hectareasController,
-          onCriticidadChanged: (v) =>
-              setState(() => criticidad = v),
-          onAfectacionChanged: (v) =>
-              setState(() => hayAfectacion = v),
+          onCriticidadChanged: (v) => setState(() => criticidad = v),
+          onAfectacionChanged: (v) => setState(() => hayAfectacion = v),
         );
       case 2:
         return StepAccionWidget(
