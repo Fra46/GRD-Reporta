@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../models/event_model.dart';
 import '../../controllers/event_controller.dart';
+import 'report_event_page.dart';
 import '../widgets/events/event_header_widget.dart';
 import '../widgets/events/info_section_widget.dart';
 import '../widgets/events/detail_item_widget.dart';
@@ -61,6 +62,15 @@ class EventDetailPage extends StatelessWidget {
                         ),
                       ),
                       _CriticidadBadge(criticidad: event.criticidad),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit_rounded,
+                          color: Colors.white,
+                        ),
+                        onPressed: () =>
+                            Get.to(() => ReportEventPage(existingEvent: event)),
+                        tooltip: 'Editar evento',
+                      ),
                     ],
                   ),
                 ),
@@ -160,6 +170,8 @@ class EventDetailPage extends StatelessWidget {
                             ),
                         ],
                       ),
+                      const SizedBox(height: 16),
+                      _AfectacionChart(event: event),
                     ],
 
                     // Activación institucional
@@ -224,7 +236,7 @@ class EventDetailPage extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: const [
-                          BoxShadow(blurRadius: 8, color: Colors.black12)
+                          BoxShadow(blurRadius: 8, color: Colors.black12),
                         ],
                       ),
                       child: EvidencePickerWidget(eventId: eventId),
@@ -252,6 +264,118 @@ class EventDetailPage extends StatelessWidget {
       '${d.day.toString().padLeft(2, '0')}/'
       '${d.month.toString().padLeft(2, '0')}/'
       '${d.year}';
+}
+
+class _AfectacionChart extends StatelessWidget {
+  final EventModel event;
+
+  const _AfectacionChart({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      _ChartItem(
+        'Personas',
+        event.personasAfectadas.toDouble(),
+        const Color(0xFF1B2E6B),
+      ),
+      _ChartItem(
+        'Familias directas',
+        event.familiasAfectadas.toDouble(),
+        const Color(0xFF2ECC71),
+      ),
+      _ChartItem(
+        'Familias indirectas',
+        event.familiasIndirectas.toDouble(),
+        const Color(0xFFFFB74D),
+      ),
+      _ChartItem(
+        'Viviendas',
+        event.viviendasAfectadas.toDouble(),
+        const Color(0xFF5589FF),
+      ),
+    ];
+    final maxValue = items
+        .map((item) => item.value)
+        .fold<double>(0, (prev, val) => val > prev ? val : prev);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [BoxShadow(blurRadius: 8, color: Colors.black12)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Visualización de Afectación',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1A1A2E),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...items.map((item) {
+            final widthFactor = maxValue > 0 ? item.value / maxValue : 0.0;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.label,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF444455),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        item.value.toInt().toString(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1B2E6B),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      height: 10,
+                      color: const Color(0xFFE8EEF7),
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: widthFactor,
+                        child: Container(color: item.color),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChartItem {
+  final String label;
+  final double value;
+  final Color color;
+
+  const _ChartItem(this.label, this.value, this.color);
 }
 
 // ─── Badge criticidad ───────────────────────────────────────────
@@ -296,10 +420,7 @@ class _CambiarEstadoWidget extends StatelessWidget {
   final EventModel event;
   final EventController controller;
 
-  const _CambiarEstadoWidget({
-    required this.event,
-    required this.controller,
-  });
+  const _CambiarEstadoWidget({required this.event, required this.controller});
 
   static const List<Map<String, dynamic>> _estados = [
     {
@@ -374,9 +495,7 @@ class _CambiarEstadoWidget extends StatelessWidget {
                           : const Color(0xFFF4F6FA),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected
-                            ? color
-                            : const Color(0xFFDDDDE8),
+                        color: isSelected ? color : const Color(0xFFDDDDE8),
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),

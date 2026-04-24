@@ -123,7 +123,7 @@ class _AfectacionSwitch extends StatelessWidget {
         value: value,
         title: const Text('¿Hay afectación a personas o bienes?',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-        activeColor: const Color(0xFF1B2E6B),
+        activeThumbColor: const Color(0xFF1B2E6B),
         onChanged: onChanged,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

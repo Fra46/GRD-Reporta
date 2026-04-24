@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../controllers/event_controller.dart';
+import '../../models/event_model.dart';
 import '../../services/location_service.dart';
 import '../widgets/report/report_header_widget.dart';
 import '../widgets/report/report_stepper_widget.dart';
@@ -14,7 +15,9 @@ import '../widgets/report/steps/step_accion_widget.dart';
 import '../widgets/report/steps/step_fotos_widget.dart';
 
 class ReportEventPage extends StatefulWidget {
-  const ReportEventPage({super.key});
+  final EventModel? existingEvent;
+
+  const ReportEventPage({super.key, this.existingEvent});
 
   @override
   State<ReportEventPage> createState() => _ReportEventPageState();
@@ -187,26 +190,53 @@ class _ReportEventPageState extends State<ReportEventPage> {
 
   // ─── Guardar ──────────────────────────────────────────────────
   Future<void> _guardar() async {
-    await controller.createEvent(
-      tipoEvento: tipoEvento,
-      municipio: municipioSeleccionado ?? 'Valledupar',
-      corregimiento: corregimientoSeleccionado ?? '',
-      ubicacion: ubicacionGps ?? '',
-      latitud: latitud,
-      longitud: longitud,
-      descripcion: descripcionController.text,
-      criticidad: criticidad,
-      hayAfectacion: hayAfectacion,
-      accionTomada: accionController.text,
-      observacion: observacionController.text,
-      personasAfectadas: int.tryParse(personasController.text) ?? 0,
-      familiasAfectadas: int.tryParse(familiasController.text) ?? 0,
-      familiasIndirectas: int.tryParse(indirectasController.text) ?? 0,
-      viviendasAfectadas: int.tryParse(viviendasAController.text) ?? 0,
-      viviendasDestruidas: int.tryParse(viviendasDController.text) ?? 0,
-      hectareasAfectadas: double.tryParse(hectareasController.text) ?? 0,
-      fotos: fotos.map((f) => File(f.path)).toList(),
-    );
+    final existing = widget.existingEvent;
+    if (existing == null) {
+      await controller.createEvent(
+        tipoEvento: tipoEvento,
+        municipio: municipioSeleccionado ?? 'Valledupar',
+        corregimiento: corregimientoSeleccionado ?? '',
+        ubicacion: ubicacionGps ?? '',
+        latitud: latitud,
+        longitud: longitud,
+        descripcion: descripcionController.text,
+        criticidad: criticidad,
+        hayAfectacion: hayAfectacion,
+        fechaEvento: fechaSeleccionada,
+        accionTomada: accionController.text,
+        observacion: observacionController.text,
+        personasAfectadas: int.tryParse(personasController.text) ?? 0,
+        familiasAfectadas: int.tryParse(familiasController.text) ?? 0,
+        familiasIndirectas: int.tryParse(indirectasController.text) ?? 0,
+        viviendasAfectadas: int.tryParse(viviendasAController.text) ?? 0,
+        viviendasDestruidas: int.tryParse(viviendasDController.text) ?? 0,
+        hectareasAfectadas: double.tryParse(hectareasController.text) ?? 0,
+        fotos: fotos.map((f) => File(f.path)).toList(),
+      );
+    } else {
+      await controller.updateEvent(
+        eventId: existing.id,
+        tipoEvento: tipoEvento,
+        municipio: municipioSeleccionado ?? 'Valledupar',
+        corregimiento: corregimientoSeleccionado ?? '',
+        ubicacion: ubicacionGps ?? '',
+        latitud: latitud,
+        longitud: longitud,
+        descripcion: descripcionController.text,
+        criticidad: criticidad,
+        hayAfectacion: hayAfectacion,
+        accionTomada: accionController.text,
+        observacion: observacionController.text,
+        personasAfectadas: int.tryParse(personasController.text) ?? 0,
+        familiasAfectadas: int.tryParse(familiasController.text) ?? 0,
+        familiasIndirectas: int.tryParse(indirectasController.text) ?? 0,
+        viviendasAfectadas: int.tryParse(viviendasAController.text) ?? 0,
+        viviendasDestruidas: int.tryParse(viviendasDController.text) ?? 0,
+        hectareasAfectadas: double.tryParse(hectareasController.text) ?? 0,
+        fechaEvento: fechaSeleccionada ?? existing.fechaEvento,
+      );
+    }
+
     Get.back();
   }
 
@@ -226,6 +256,34 @@ class _ReportEventPageState extends State<ReportEventPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    final existing = widget.existingEvent;
+    if (existing != null) {
+      municipioSeleccionado = existing.municipio;
+      corregimientoSeleccionado = existing.corregimiento;
+      tipoEvento = existing.tipoEvento;
+      fechaSeleccionada = existing.fechaEvento;
+      fechaController.text = _formatDate(existing.fechaEvento);
+      descripcionController.text = existing.descripcion;
+      criticidad = existing.criticidad;
+      hayAfectacion = existing.hayAfectacion;
+      personasController.text = existing.personasAfectadas.toString();
+      familiasController.text = existing.familiasAfectadas.toString();
+      indirectasController.text = existing.familiasIndirectas.toString();
+      viviendasAController.text = existing.viviendasAfectadas.toString();
+      viviendasDController.text = existing.viviendasDestruidas.toString();
+      hectareasController.text = existing.hectareasAfectadas.toString();
+      accionController.text = existing.accionTomada;
+      observacionController.text = existing.observacion;
+      ubicacionGps = existing.ubicacion;
+      latitud = existing.latitud;
+      longitud = existing.longitud;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
@@ -233,7 +291,11 @@ class _ReportEventPageState extends State<ReportEventPage> {
         children: [
           Column(
             children: [
-              const ReportHeaderWidget(),
+              ReportHeaderWidget(
+                title: widget.existingEvent == null
+                    ? 'Nuevo Reporte'
+                    : 'Editar Reporte',
+              ),
               ReportStepperWidget(currentStep: currentStep),
               Expanded(
                 child: SingleChildScrollView(
@@ -246,6 +308,7 @@ class _ReportEventPageState extends State<ReportEventPage> {
               ),
               ReportBottomButtonsWidget(
                 currentStep: currentStep,
+                isEditing: widget.existingEvent != null,
                 isLoading: controller.isLoading,
                 onNext: _next,
                 onBack: _back,
@@ -381,5 +444,11 @@ class _ReportEventPageState extends State<ReportEventPage> {
       default:
         return const SizedBox();
     }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
   }
 }
