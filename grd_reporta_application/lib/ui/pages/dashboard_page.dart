@@ -10,6 +10,7 @@ import '../widgets/dashboard/dashboard_kpi_card.dart';
 import '../widgets/dashboard/dashboard_bottom_nav.dart';
 import '../widgets/events/event_card_widget.dart';
 
+import '../widgets/events/event_map_widget.dart';
 import 'report_event_page.dart';
 import 'event_list_page.dart';
 import 'export_report_page.dart';
@@ -51,7 +52,7 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 14),
-                        _buildMapPlaceholder(),
+                        const EventMapWidget(),
                         const SizedBox(height: 28),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,77 +131,6 @@ class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildMapPlaceholder() {
-    return Container(
-      height: 180,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8EEF7),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: Stack(
-        children: [
-          CustomPaint(
-            size: const Size(double.infinity, 180),
-            painter: _MapGridPainter(),
-          ),
-          Positioned(left: 90, top: 60, child: _mapPin(Colors.red)),
-          Positioned(left: 180, top: 95, child: _mapPin(Colors.orange)),
-          Positioned(left: 130, top: 110, child: _mapPin(Colors.blue)),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              color: Colors.white.withOpacity(0.85),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.location_on, size: 14, color: Color(0xFF1B2E6B)),
-                  SizedBox(width: 4),
-                  Text(
-                    'Cesar, Colombia — Geolocalización próximamente',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF1B2E6B),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _mapPin(Color color) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 18,
-          height: 18,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.4),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-        ),
-        Container(width: 2, height: 8, color: color),
-      ],
     );
   }
 
@@ -323,46 +253,4 @@ class DashboardPage extends StatelessWidget {
       ),
     ]);
   }
-}
-
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFCDD8EC)
-      ..strokeWidth = 1;
-
-    for (double y = 0; y < size.height; y += 28) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-    for (double x = 0; x < size.width; x += 28) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-
-    final roadPaint = Paint()
-      ..color = const Color(0xFFB8C8E0)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    final path = Path()
-      ..moveTo(0, size.height * 0.4)
-      ..cubicTo(
-        size.width * 0.3, size.height * 0.3,
-        size.width * 0.6, size.height * 0.6,
-        size.width, size.height * 0.5,
-      );
-    canvas.drawPath(path, roadPaint);
-
-    final path2 = Path()
-      ..moveTo(size.width * 0.2, 0)
-      ..cubicTo(
-        size.width * 0.3, size.height * 0.4,
-        size.width * 0.4, size.height * 0.6,
-        size.width * 0.5, size.height,
-      );
-    canvas.drawPath(path2, roadPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
