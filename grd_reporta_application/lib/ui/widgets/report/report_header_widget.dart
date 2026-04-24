@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ReportHeaderWidget extends StatelessWidget {
-  const ReportHeaderWidget({super.key});
+  final String title;
+
+  const ReportHeaderWidget({super.key, this.title = 'Nuevo Reporte'});
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +18,10 @@ class ReportHeaderWidget extends StatelessWidget {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: () => Get.back(),
               ),
               const Expanded(

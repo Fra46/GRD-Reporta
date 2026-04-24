@@ -34,10 +34,10 @@ class EventMapWidget extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: Stack(
           children: [
-            // Fondo de grilla
+            // Fondo de mapa más visual
             CustomPaint(
               size: const Size(double.infinity, 200),
-              painter: _MapGridPainter(),
+              painter: _MapBackgroundPainter(),
             ),
 
             // Pins de eventos con GPS real
@@ -46,8 +46,7 @@ class EventMapWidget extends StatelessWidget {
                 builder: (context, constraints) {
                   return Stack(
                     children: eventosConGps.map((e) {
-                      final x = _lngToX(
-                          e.longitud!, constraints.maxWidth);
+                      final x = _lngToX(e.longitud!, constraints.maxWidth);
                       final y = _latToY(e.latitud!, 200);
                       return Positioned(
                         left: x - 9,
@@ -61,30 +60,32 @@ class EventMapWidget extends StatelessWidget {
 
             // Pins decorativos si no hay GPS
             if (eventosConGps.isEmpty) ...[
-              Positioned(
-                  left: 90, top: 60, child: _staticPin(Colors.grey)),
-              Positioned(
-                  left: 180, top: 95, child: _staticPin(Colors.grey)),
-              Positioned(
-                  left: 130, top: 110, child: _staticPin(Colors.grey)),
+              Positioned(left: 90, top: 60, child: _staticPin(Colors.grey)),
+              Positioned(left: 180, top: 95, child: _staticPin(Colors.grey)),
+              Positioned(left: 130, top: 110, child: _staticPin(Colors.grey)),
             ],
 
             // Barra inferior con info
             Positioned(
-              bottom: 0, left: 0, right: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 7),
                 color: Colors.white.withOpacity(0.88),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.location_on,
-                        size: 13, color: Color(0xFF1B2E6B)),
+                    const Icon(
+                      Icons.location_on,
+                      size: 13,
+                      color: Color(0xFF1B2E6B),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       eventosConGps.isNotEmpty
                           ? '${eventosConGps.length} evento(s) con GPS — '
-                            'Cesar, Colombia'
+                                '${eventosConGps.length == 1 ? eventosConGps.first.municipio : 'Cesar, Colombia'}'
                           : 'Cesar, Colombia — sin GPS aún',
                       style: const TextStyle(
                         fontSize: 11,
@@ -117,9 +118,11 @@ class EventMapWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 16, height: 16,
+          width: 16,
+          height: 16,
           decoration: BoxDecoration(
-            color: color, shape: BoxShape.circle,
+            color: color,
+            shape: BoxShape.circle,
             border: Border.all(color: Colors.white, width: 2),
           ),
         ),
@@ -150,7 +153,8 @@ class _EventPin extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 18, height: 18,
+            width: 18,
+            height: 18,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
@@ -172,52 +176,84 @@ class _EventPin extends StatelessWidget {
 
   Color _colorPorCriticidad(String c) {
     switch (c.toLowerCase()) {
-      case 'alta':   return Colors.red;
-      case 'media':  return Colors.orange;
-      default:       return const Color(0xFF27AE60);
+      case 'alta':
+        return Colors.red;
+      case 'media':
+        return Colors.orange;
+      default:
+        return const Color(0xFF27AE60);
     }
   }
 }
 
 // ─── Painter de grilla de fondo ─────────────────────────────────
-class _MapGridPainter extends CustomPainter {
+class _MapBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFCDD8EC)
-      ..strokeWidth = 1;
+    final rect = Offset.zero & size;
+    final gradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [const Color(0xFFEFF4FB), const Color(0xFFD7E5F6)],
+    );
+    canvas.drawRect(rect, Paint()..shader = gradient.createShader(rect));
 
-    for (double y = 0; y < size.height; y += 28) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-    for (double x = 0; x < size.width; x += 28) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-
-    final road = Paint()
-      ..color = const Color(0xFFB8C8E0)
-      ..strokeWidth = 3
+    final linePaint = Paint()
+      ..color = Colors.white.withOpacity(0.7)
+      ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
-    canvas.drawPath(
-      Path()
-        ..moveTo(0, size.height * 0.4)
-        ..cubicTo(
-          size.width * 0.3, size.height * 0.3,
-          size.width * 0.6, size.height * 0.6,
-          size.width, size.height * 0.5,
-        ),
-      road,
+    final route1 = Path()
+      ..moveTo(size.width * 0.1, size.height * 0.75)
+      ..cubicTo(
+        size.width * 0.2,
+        size.height * 0.55,
+        size.width * 0.35,
+        size.height * 0.4,
+        size.width * 0.5,
+        size.height * 0.45,
+      )
+      ..cubicTo(
+        size.width * 0.65,
+        size.height * 0.5,
+        size.width * 0.75,
+        size.height * 0.65,
+        size.width * 0.9,
+        size.height * 0.55,
+      );
+
+    final route2 = Path()
+      ..moveTo(size.width * 0.15, size.height * 0.25)
+      ..cubicTo(
+        size.width * 0.3,
+        size.height * 0.15,
+        size.width * 0.45,
+        size.height * 0.3,
+        size.width * 0.55,
+        size.height * 0.25,
+      )
+      ..cubicTo(
+        size.width * 0.65,
+        size.height * 0.2,
+        size.width * 0.75,
+        size.height * 0.3,
+        size.width * 0.85,
+        size.height * 0.18,
+      );
+
+    canvas.drawPath(route1, linePaint);
+    canvas.drawPath(route2, linePaint);
+
+    final dotPaint = Paint()..color = const Color(0xFF1B2E6B);
+    canvas.drawCircle(
+      Offset(size.width * 0.75, size.height * 0.3),
+      4,
+      dotPaint,
     );
-    canvas.drawPath(
-      Path()
-        ..moveTo(size.width * 0.2, 0)
-        ..cubicTo(
-          size.width * 0.3, size.height * 0.4,
-          size.width * 0.4, size.height * 0.6,
-          size.width * 0.5, size.height,
-        ),
-      road,
+    canvas.drawCircle(
+      Offset(size.width * 0.35, size.height * 0.7),
+      3,
+      dotPaint,
     );
   }
 
