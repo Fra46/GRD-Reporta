@@ -16,7 +16,7 @@ class EventCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.to(() => EventDetailPage(event: event)),
+      onTap: () => Get.to(() => EventDetailPage(eventId: event.id)),
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(18),
