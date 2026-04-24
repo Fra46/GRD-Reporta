@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
+import '../../pages/event_list_page.dart';
 
 class DashboardBottomNav extends StatelessWidget {
   const DashboardBottomNav({super.key});
@@ -23,10 +24,27 @@ class DashboardBottomNav extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _NavItem(icon: Icons.home_rounded, label: 'Inicio', selected: true),
-          _NavItem(icon: Icons.warning_amber_rounded, label: 'Reportes'),
-          _NavItem(icon: Icons.map_rounded, label: 'Mapa'),
-          _LogoutButton(),
+          _NavItem(
+            icon: Icons.home_rounded,
+            label: 'Inicio',
+            selected: true,
+            onTap: () {},
+          ),
+          _NavItem(
+            icon: Icons.warning_amber_rounded,
+            label: 'Reportes',
+            onTap: () => Get.to(() => const EventListPage()),
+          ),
+          _NavItem(
+            icon: Icons.map_rounded,
+            label: 'Mapa',
+            onTap: () => Get.snackbar(
+              'Próximamente',
+              'Módulo de mapa en desarrollo',
+              snackPosition: SnackPosition.BOTTOM,
+            ),
+          ),
+          const _LogoutButton(),
         ],
       ),
     );
@@ -37,10 +55,12 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool selected;
+  final VoidCallback onTap;
 
   const _NavItem({
     required this.icon,
     required this.label,
+    required this.onTap,
     this.selected = false,
   });
 
@@ -51,7 +71,7 @@ class _NavItem extends StatelessWidget {
     return Expanded(
       child: InkWell(
         borderRadius: BorderRadius.circular(32),
-        onTap: () {},
+        onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -62,7 +82,8 @@ class _NavItem extends StatelessWidget {
               style: TextStyle(
                 color: color,
                 fontSize: 11,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                fontWeight:
+                    selected ? FontWeight.w700 : FontWeight.normal,
               ),
             ),
           ],
@@ -73,6 +94,8 @@ class _NavItem extends StatelessWidget {
 }
 
 class _LogoutButton extends StatelessWidget {
+  const _LogoutButton();
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -119,10 +142,7 @@ class _LogoutButton extends StatelessWidget {
             SizedBox(height: 2),
             Text(
               'Salir',
-              style: TextStyle(
-                color: Color(0xFFE74C3C),
-                fontSize: 11,
-              ),
+              style: TextStyle(color: Color(0xFFE74C3C), fontSize: 11),
             ),
           ],
         ),

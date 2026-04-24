@@ -10,7 +10,7 @@ class EventListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final EventController controller = Get.put(EventController());
+    final EventController controller = Get.find<EventController>();
     controller.loadEvents();
 
     return Scaffold(
