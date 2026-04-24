@@ -1,30 +1,32 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:grd_reporta_application/ui/app.dart';
+import 'package:grd_reporta_application/models/event_model.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const GrdReportaApp());
+  test('EventModel copyWith preserves unchanged fields', () {
+    final original = EventModel(
+      id: '123',
+      municipio: 'Valledupar',
+      tipoEvento: 'Incendio',
+      descripcion: 'Fuego en zona rural',
+      criticidad: 'alta',
+      fechaEvento: DateTime(2026, 4, 24),
+      fechaRegistro: DateTime(2026, 4, 24),
+      hayAfectacion: true,
+      requiereEdan: true,
+      escaladoCmgrd: true,
+      usuarioId: 'user-1',
+      usuarioNombre: 'Prueba',
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final updated = original.copyWith(
+      municipio: 'Aguachica',
+      estado: 'cerrado',
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(updated.id, original.id);
+    expect(updated.tipoEvento, original.tipoEvento);
+    expect(updated.municipio, 'Aguachica');
+    expect(updated.estado, 'cerrado');
+    expect(updated.descripcion, original.descripcion);
   });
 }

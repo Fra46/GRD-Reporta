@@ -33,6 +33,13 @@ dependencies:
   path_provider: ^2.1.5
   share_plus: ^9.0.0
 
+  fl_chart: ^0.66.1
+  pdf: ^3.10.7
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^3.5.6
+
+  flutter_local_notifications: ^16.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

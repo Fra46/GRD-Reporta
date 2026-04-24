@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'services/notification_service.dart';
 import 'ui/app.dart';
 
 Future<void> main() async {
@@ -9,6 +10,9 @@ Future<void> main() async {
 
   // Inicializar Firebase
   await Firebase.initializeApp();
+
+  // Inicializar notificaciones
+  await NotificationService.initialize();
 
   // Inicializar Hive (almacenamiento local / offline)
   await Hive.initFlutter();
