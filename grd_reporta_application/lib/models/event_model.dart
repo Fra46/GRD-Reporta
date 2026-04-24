@@ -5,6 +5,8 @@ class EventModel {
   final String municipio;
   final String corregimiento;
   final String ubicacion;
+  final double? latitud;
+  final double? longitud;
 
   // Evento
   final String tipoEvento;
@@ -40,6 +42,9 @@ class EventModel {
   final String estado;
   final String observacion;
 
+  // Evidencia fotográfica (URLs de Cloudinary)
+  final List<String> fotosUrls;
+
   // Auditoría
   final String usuarioId;
   final String usuarioNombre;
@@ -49,6 +54,8 @@ class EventModel {
     required this.municipio,
     this.corregimiento = '',
     this.ubicacion = '',
+    this.latitud,
+    this.longitud,
     required this.tipoEvento,
     required this.descripcion,
     required this.criticidad,
@@ -69,6 +76,7 @@ class EventModel {
     this.apoyoMunicipio = false,
     this.estado = 'abierto',
     this.observacion = '',
+    this.fotosUrls = const [],
     required this.usuarioId,
     required this.usuarioNombre,
   });
@@ -79,6 +87,8 @@ class EventModel {
       'municipio': municipio,
       'corregimiento': corregimiento,
       'ubicacion': ubicacion,
+      'latitud': latitud,
+      'longitud': longitud,
       'tipoEvento': tipoEvento,
       'descripcion': descripcion,
       'criticidad': criticidad,
@@ -99,6 +109,7 @@ class EventModel {
       'apoyoMunicipio': apoyoMunicipio,
       'estado': estado,
       'observacion': observacion,
+      'fotosUrls': fotosUrls,
       'usuarioId': usuarioId,
       'usuarioNombre': usuarioNombre,
     };
@@ -110,6 +121,8 @@ class EventModel {
       municipio: map['municipio'] ?? '',
       corregimiento: map['corregimiento'] ?? '',
       ubicacion: map['ubicacion'] ?? '',
+      latitud: (map['latitud'] as num?)?.toDouble(),
+      longitud: (map['longitud'] as num?)?.toDouble(),
       tipoEvento: map['tipoEvento'] ?? '',
       descripcion: map['descripcion'] ?? '',
       criticidad: map['criticidad'] ?? 'baja',
@@ -130,17 +143,20 @@ class EventModel {
       apoyoMunicipio: map['apoyoMunicipio'] ?? false,
       estado: map['estado'] ?? 'abierto',
       observacion: map['observacion'] ?? '',
+      fotosUrls: List<String>.from(map['fotosUrls'] ?? []),
       usuarioId: map['usuarioId'] ?? '',
       usuarioNombre: map['usuarioNombre'] ?? '',
     );
   }
 
-  EventModel copyWith({String? estado}) {
+  EventModel copyWith({String? estado, List<String>? fotosUrls}) {
     return EventModel(
       id: id,
       municipio: municipio,
       corregimiento: corregimiento,
       ubicacion: ubicacion,
+      latitud: latitud,
+      longitud: longitud,
       tipoEvento: tipoEvento,
       descripcion: descripcion,
       criticidad: criticidad,
@@ -161,6 +177,7 @@ class EventModel {
       apoyoMunicipio: apoyoMunicipio,
       estado: estado ?? this.estado,
       observacion: observacion,
+      fotosUrls: fotosUrls ?? this.fotosUrls,
       usuarioId: usuarioId,
       usuarioNombre: usuarioNombre,
     );
