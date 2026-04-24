@@ -5,7 +5,9 @@ import 'package:uuid/uuid.dart';
 
 import '../models/event_model.dart';
 import '../services/cloudinary_service.dart';
+import '../services/notification_service.dart';
 import 'auth_controller.dart';
+import 'sync_controller.dart';
 
 class EventController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -115,17 +117,29 @@ class EventController extends GetxController {
         usuarioNombre: auth.name,
       );
 
-      await _db.collection('events').doc(eventoId).set(event.toMap());
+      final sync = Get.find<SyncController>();
+      if (sync.isOnline.value) {
+        await _db.collection('events').doc(eventoId).set(event.toMap());
+        Get.snackbar(
+          'Éxito',
+          fotos.isNotEmpty
+              ? 'Evento registrado con ${fotosUrls.length} foto(s)'
+              : 'Evento registrado correctamente',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        await loadEvents();
 
-      Get.snackbar(
-        'Éxito',
-        fotos.isNotEmpty
-            ? 'Evento registrado con ${fotosUrls.length} foto(s)'
-            : 'Evento registrado correctamente',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-
-      await loadEvents();
+        // Notificación para evento crítico
+        if (criticidad == 'alta') {
+          await NotificationService.showLocalNotification(
+            title: 'Evento Crítico Reportado',
+            body:
+                'Nuevo evento de alta criticidad en ${municipio}: ${descripcion}',
+          );
+        }
+      } else {
+        await sync.saveOffline(event.toMap());
+      }
     } catch (e) {
       isUploading.value = false;
       Get.snackbar(
@@ -138,6 +152,18 @@ class EventController extends GetxController {
       isUploading.value = false;
       uploadProgress.value = 0;
       uploadStatus.value = '';
+    }
+  }
+
+  // =====================================
+  // CREAR EVENTO DESDE MODELO (PARA SINCRONIZACIÓN)
+  // =====================================
+
+  Future<void> createEventFromModel(EventModel event) async {
+    try {
+      await _db.collection('events').doc(event.id).set(event.toMap());
+    } catch (e) {
+      throw Exception('Error al sincronizar evento: $e');
     }
   }
 
@@ -341,6 +367,13 @@ class EventController extends GetxController {
         'Estado actualizado',
         'Evento marcado como: $nuevoEstado',
         snackPosition: SnackPosition.BOTTOM,
+      );
+
+      // Notificación de cambio de estado
+      await NotificationService.showLocalNotification(
+        title: 'Estado de Evento Actualizado',
+        body:
+            'El evento ${events[idx].tipoEvento} en ${events[idx].municipio} cambió a: $nuevoEstado',
       );
     } catch (_) {
       Get.snackbar('Error', 'No se pudo actualizar el estado');

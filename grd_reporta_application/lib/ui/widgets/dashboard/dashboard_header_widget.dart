@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
+import '../sync_indicator_widget.dart';
 
 class DashboardHeaderWidget extends StatelessWidget {
   const DashboardHeaderWidget({super.key});
@@ -9,7 +10,13 @@ class DashboardHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Get.find<AuthController>();
     final initials = auth.name.isNotEmpty
-        ? auth.name.trim().split(' ').take(2).map((w) => w[0]).join().toUpperCase()
+        ? auth.name
+              .trim()
+              .split(' ')
+              .take(2)
+              .map((w) => w[0])
+              .join()
+              .toUpperCase()
         : 'U';
 
     return Container(
@@ -98,6 +105,10 @@ class DashboardHeaderWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: SyncIndicatorWidget(),
+              ),
               const Text(
                 'Departamento del Cesar',
                 style: TextStyle(color: Colors.white70, fontSize: 14),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../pages/event_list_page.dart';
+import '../../pages/analytics_page.dart';
 
 class DashboardBottomNav extends StatelessWidget {
   const DashboardBottomNav({super.key});
@@ -36,13 +37,9 @@ class DashboardBottomNav extends StatelessWidget {
             onTap: () => Get.to(() => const EventListPage()),
           ),
           _NavItem(
-            icon: Icons.map_rounded,
-            label: 'Mapa',
-            onTap: () => Get.snackbar(
-              'Próximamente',
-              'Módulo de mapa en desarrollo',
-              snackPosition: SnackPosition.BOTTOM,
-            ),
+            icon: Icons.bar_chart_rounded,
+            label: 'Analíticas',
+            onTap: () => Get.to(() => const AnalyticsPage()),
           ),
           const _LogoutButton(),
         ],
@@ -82,8 +79,7 @@ class _NavItem extends StatelessWidget {
               style: TextStyle(
                 color: color,
                 fontSize: 11,
-                fontWeight:
-                    selected ? FontWeight.w700 : FontWeight.normal,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
               ),
             ),
           ],
