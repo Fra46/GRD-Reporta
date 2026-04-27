@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../controllers/analytics_controller.dart';
+import '../../services/pdf_analytics_service.dart';
 
 class AnalyticsPage extends StatelessWidget {
   const AnalyticsPage({super.key});
@@ -15,6 +16,15 @@ class AnalyticsPage extends StatelessWidget {
         title: const Text('Dashboard Analítico'),
         backgroundColor: const Color(0xFF1B2E6B),
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf_rounded),
+            tooltip: 'Exportar PDF',
+            onPressed: () async {
+              await PdfAnalyticsService.exportDashboard(ac);
+            },
+          ),
+        ],
       ),
       body: Obx(() {
         return SingleChildScrollView(

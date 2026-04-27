@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../controllers/auth_controller.dart';
 import '../../pages/event_list_page.dart';
 import '../../pages/analytics_page.dart';
+import '../../pages/profile_page.dart';
 
 class DashboardBottomNav extends StatelessWidget {
   const DashboardBottomNav({super.key});
@@ -45,7 +45,11 @@ class DashboardBottomNav extends StatelessWidget {
               duration: const Duration(milliseconds: 320),
             ),
           ),
-          const _LogoutButton(),
+          _NavItem(
+            icon: Icons.person_outline_rounded,
+            label: 'Perfil',
+            onTap: () => Get.to(() => const ProfilePage()),
+          ),
         ],
       ),
     );
@@ -85,64 +89,6 @@ class _NavItem extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LogoutButton extends StatelessWidget {
-  const _LogoutButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(32),
-        onTap: () async {
-          final confirm = await Get.dialog<bool>(
-            AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: const Text('Cerrar sesión'),
-              content: const Text('¿Estás seguro que deseas salir?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Get.back(result: false),
-                  child: const Text('Cancelar'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B2E6B),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () => Get.back(result: true),
-                  child: const Text(
-                    'Salir',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          );
-
-          if (confirm == true) {
-            await Get.find<AuthController>().logout();
-          }
-        },
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.logout_rounded, color: Color(0xFFE74C3C), size: 24),
-            SizedBox(height: 2),
-            Text(
-              'Salir',
-              style: TextStyle(color: Color(0xFFE74C3C), fontSize: 11),
             ),
           ],
         ),

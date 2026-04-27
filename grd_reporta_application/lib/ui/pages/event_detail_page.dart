@@ -8,6 +8,7 @@ import '../widgets/events/event_header_widget.dart';
 import '../widgets/events/info_section_widget.dart';
 import '../widgets/events/detail_item_widget.dart';
 import '../widgets/evidence_picker_widget.dart';
+import '../widgets/events/event_qr_widget.dart';
 
 class EventDetailPage extends StatelessWidget {
   // Recibimos solo el ID — el widget siempre lee el estado fresco del controller
@@ -241,6 +242,9 @@ class EventDetailPage extends StatelessWidget {
                       ),
                       child: EvidencePickerWidget(eventId: eventId),
                     ),
+
+                    const SizedBox(height: 20),
+                    EventQrWidget(event: event),
 
                     // Cambio de estado
                     const SizedBox(height: 24),

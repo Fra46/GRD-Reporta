@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
 import '../theme.dart';
 import '../widgets/shared/app_button.dart';
 import '../../controllers/auth_controller.dart';
@@ -16,7 +17,60 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final LocalAuthentication _localAuth = LocalAuthentication();
   bool obscurePassword = true;
+  bool _biometricAvailable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometricAvailability();
+  }
+
+  Future<void> _checkBiometricAvailability() async {
+    try {
+      final isDeviceSupported = await _localAuth.isDeviceSupported();
+      final availableBiometrics = await _localAuth.getAvailableBiometrics();
+
+      setState(() {
+        _biometricAvailable =
+            isDeviceSupported && availableBiometrics.isNotEmpty;
+      });
+    } catch (e) {
+      setState(() {
+        _biometricAvailable = false;
+      });
+    }
+  }
+
+  Future<void> _authenticateWithBiometrics() async {
+    try {
+      final authenticated = await _localAuth.authenticate(
+        localizedReason: 'Autentícate para acceder a GRD Reporta',
+      );
+
+      if (authenticated) {
+        // Si la autenticación biométrica es exitosa, intentar login automático
+        // con credenciales guardadas o usuario actual
+        if (authController.firebaseUser.value != null) {
+          // Usuario ya autenticado en Firebase, solo redirigir
+          Get.offAllNamed('/dashboard');
+        } else {
+          Get.snackbar(
+            'Autenticación exitosa',
+            'Por favor ingresa tus credenciales manualmente',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Error en autenticación biométrica',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -249,6 +303,41 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             const SizedBox(height: 16),
+                            if (_biometricAvailable)
+                              Column(
+                                children: [
+                                  const Text(
+                                    'o',
+                                    style: TextStyle(
+                                      color: Color(0xFF888899),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton.icon(
+                                    onPressed: _authenticateWithBiometrics,
+                                    icon: const Icon(
+                                      Icons.fingerprint,
+                                      color: Colors.white,
+                                    ),
+                                    label: const Text(
+                                      'Ingresar con Huella',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF1B2E6B),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
                             TextButton(
                               onPressed: () {},
                               style: TextButton.styleFrom(
