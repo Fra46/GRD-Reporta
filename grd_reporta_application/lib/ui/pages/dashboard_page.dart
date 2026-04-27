@@ -14,6 +14,7 @@ import '../widgets/events/event_map_widget.dart';
 import 'report_event_page.dart';
 import 'event_list_page.dart';
 import 'export_report_page.dart';
+import 'heatmap_page.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -52,7 +53,10 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 14),
-                        const EventMapWidget(),
+                        GestureDetector(
+                          onTap: () => Get.to(() => const HeatmapPage()),
+                          child: const EventMapWidget(),
+                        ),
                         const SizedBox(height: 28),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,7 +70,8 @@ class DashboardPage extends StatelessWidget {
                               ),
                             ),
                             TextButton(
-                              onPressed: () => Get.to(() => const EventListPage()),
+                              onPressed: () =>
+                                  Get.to(() => const EventListPage()),
                               child: const Text(
                                 'Ver todos',
                                 style: TextStyle(color: Color(0xFF1B2E6B)),
@@ -112,14 +117,20 @@ class DashboardPage extends StatelessWidget {
                         FloatingActionButton.small(
                           heroTag: 'fab_export',
                           backgroundColor: const Color(0xFF1B2E6B),
-                          onPressed: () => Get.to(() => const ExportReportPage()),
-                          child: const Icon(Icons.download, color: Colors.white, size: 20),
+                          onPressed: () =>
+                              Get.to(() => const ExportReportPage()),
+                          child: const Icon(
+                            Icons.download,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(height: 10),
                         FloatingActionButton(
                           heroTag: 'fab_report',
                           backgroundColor: Colors.red,
-                          onPressed: () => Get.to(() => const ReportEventPage()),
+                          onPressed: () =>
+                              Get.to(() => const ReportEventPage()),
                           child: const Icon(Icons.add, color: Colors.white),
                         ),
                       ],
@@ -136,8 +147,62 @@ class DashboardPage extends StatelessWidget {
 
   Widget _buildKpiSection(String role, DashboardController controller) {
     if (role == 'admin') {
-      return Column(children: [
-        Row(children: [
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: DashboardKpiCard(
+                  title: 'Eventos',
+                  value: controller.totalEventos.toString(),
+                  icon: Icons.list_alt_rounded,
+                  iconColor: const Color(0xFF1A6FD4),
+                  iconBgColor: const Color(0xFFE3EFFD),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: DashboardKpiCard(
+                  title: 'Críticos',
+                  value: controller.totalCriticos.toString(),
+                  icon: Icons.warning_amber_rounded,
+                  iconColor: Colors.red,
+                  iconBgColor: const Color(0xFFFFECEC),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: DashboardKpiCard(
+                  title: 'Afectación',
+                  value: controller.totalConAfectacion.toString(),
+                  icon: Icons.people_alt_rounded,
+                  iconColor: const Color(0xFF27AE60),
+                  iconBgColor: const Color(0xFFE6F9EE),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: DashboardKpiCard(
+                  title: 'EDAN',
+                  value: controller.totalEdan.toString(),
+                  icon: Icons.fact_check_rounded,
+                  iconColor: const Color(0xFF16A085),
+                  iconBgColor: const Color(0xFFE0F7F4),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    if (role == 'coordinador') {
+      return Row(
+        children: [
           Expanded(
             child: DashboardKpiCard(
               title: 'Eventos',
@@ -157,41 +222,45 @@ class DashboardPage extends StatelessWidget {
               iconBgColor: const Color(0xFFFFECEC),
             ),
           ),
-        ]),
-        const SizedBox(height: 14),
-        Row(children: [
-          Expanded(
-            child: DashboardKpiCard(
-              title: 'Afectación',
-              value: controller.totalConAfectacion.toString(),
-              icon: Icons.people_alt_rounded,
-              iconColor: const Color(0xFF27AE60),
-              iconBgColor: const Color(0xFFE6F9EE),
-            ),
-          ),
-          const SizedBox(width: 14),
+        ],
+      );
+    }
+
+    if (role == 'analista') {
+      return Row(
+        children: [
           Expanded(
             child: DashboardKpiCard(
               title: 'EDAN',
               value: controller.totalEdan.toString(),
               icon: Icons.fact_check_rounded,
-              iconColor: const Color(0xFF16A085),
-              iconBgColor: const Color(0xFFE0F7F4),
+              iconColor: const Color(0xFF1A6FD4),
+              iconBgColor: const Color(0xFFE3EFFD),
             ),
           ),
-        ]),
-      ]);
+          const SizedBox(width: 14),
+          Expanded(
+            child: DashboardKpiCard(
+              title: 'Críticos',
+              value: controller.totalCriticos.toString(),
+              icon: Icons.analytics_rounded,
+              iconColor: Colors.red,
+              iconBgColor: const Color(0xFFFFECEC),
+            ),
+          ),
+        ],
+      );
     }
 
-    if (role == 'coordinador') {
-      return Row(children: [
+    return Row(
+      children: [
         Expanded(
           child: DashboardKpiCard(
             title: 'Eventos',
             value: controller.totalEventos.toString(),
-            icon: Icons.list_alt_rounded,
-            iconColor: const Color(0xFF1A6FD4),
-            iconBgColor: const Color(0xFFE3EFFD),
+            icon: Icons.bar_chart_rounded,
+            iconColor: const Color(0xFF1B2E6B),
+            iconBgColor: const Color(0xFFE8ECF7),
           ),
         ),
         const SizedBox(width: 14),
@@ -199,58 +268,12 @@ class DashboardPage extends StatelessWidget {
           child: DashboardKpiCard(
             title: 'Críticos',
             value: controller.totalCriticos.toString(),
-            icon: Icons.warning_amber_rounded,
+            icon: Icons.pie_chart_rounded,
             iconColor: Colors.red,
             iconBgColor: const Color(0xFFFFECEC),
           ),
         ),
-      ]);
-    }
-
-    if (role == 'analista') {
-      return Row(children: [
-        Expanded(
-          child: DashboardKpiCard(
-            title: 'EDAN',
-            value: controller.totalEdan.toString(),
-            icon: Icons.fact_check_rounded,
-            iconColor: const Color(0xFF1A6FD4),
-            iconBgColor: const Color(0xFFE3EFFD),
-          ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: DashboardKpiCard(
-            title: 'Críticos',
-            value: controller.totalCriticos.toString(),
-            icon: Icons.analytics_rounded,
-            iconColor: Colors.red,
-            iconBgColor: const Color(0xFFFFECEC),
-          ),
-        ),
-      ]);
-    }
-
-    return Row(children: [
-      Expanded(
-        child: DashboardKpiCard(
-          title: 'Eventos',
-          value: controller.totalEventos.toString(),
-          icon: Icons.bar_chart_rounded,
-          iconColor: const Color(0xFF1B2E6B),
-          iconBgColor: const Color(0xFFE8ECF7),
-        ),
-      ),
-      const SizedBox(width: 14),
-      Expanded(
-        child: DashboardKpiCard(
-          title: 'Críticos',
-          value: controller.totalCriticos.toString(),
-          icon: Icons.pie_chart_rounded,
-          iconColor: Colors.red,
-          iconBgColor: const Color(0xFFFFECEC),
-        ),
-      ),
-    ]);
+      ],
+    );
   }
 }

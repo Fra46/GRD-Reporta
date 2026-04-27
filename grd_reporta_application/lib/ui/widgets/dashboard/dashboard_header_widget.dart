@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
+import '../../pages/notifications_page.dart';
+import '../../pages/qr_scanner_page.dart';
 import '../sync_indicator_widget.dart';
 
 class DashboardHeaderWidget extends StatelessWidget {
@@ -69,27 +71,42 @@ class DashboardHeaderWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Stack(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: const Icon(
-                          Icons.notifications_outlined,
+                          Icons.qr_code_scanner,
                           color: Colors.white,
                           size: 26,
                         ),
-                        onPressed: () {},
+                        onPressed: () => Get.to(() => const QrScannerPage()),
+                        tooltip: 'Escanear QR',
                       ),
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          width: 9,
-                          height: 9,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications_outlined,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                            onPressed: () =>
+                                Get.to(() => const NotificationsPage()),
                           ),
-                        ),
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              width: 9,
+                              height: 9,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
